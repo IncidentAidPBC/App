@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/content"
+    android:theme="@style/Theme.AppCompat.Light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:background="@drawable/border"
+            android:text="Captain"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/border"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="PERSONNEL"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/all_people"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_weight="3"
+                android:background="@drawable/border"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:text="ON DUTY"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/on_duty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--    xmlns:tools="http://schemas.android.com/tools"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="match_parent"-->
+    <!--    android:orientation="vertical"-->
+    <!--    app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+    <!--    tools:showIn="@layout/app_bar_main">-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/student_email"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="45dp"-->
+    <!--        android:layout_alignParentEnd="true"-->
+    <!--        android:layout_marginTop="100dp"-->
+    <!--        android:gravity="center_horizontal"-->
+    <!--        android:text="TextView"-->
+    <!--        android:textColor="#000000"-->
+    <!--        android:textSize="25dp"-->
+    <!--        android:textStyle="bold" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/sample"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="30dp"-->
+    <!--        android:layout_alignParentEnd="true"-->
+    <!--        android:layout_marginTop="50dp"-->
+    <!--        android:gravity="center_horizontal"-->
+    <!--        android:text="qwe"-->
+    <!--        android:textColor="#000000"-->
+    <!--        android:textSize="25dp"-->
+    <!--        android:textStyle="bold" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/mycount"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="30dp"-->
+    <!--        android:layout_centerHorizontal="true"-->
+    <!--        android:layout_marginTop="70dp"-->
+    <!--        android:gravity="center_horizontal"-->
+    <!--        android:text="COUNT"-->
+    <!--        android:textColor="#ff0000"-->
+    <!--        android:textSize="25dp"-->
+    <!--        android:textStyle="bold" />-->
+
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/mytotalclass"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="30dp"-->
+    <!--        android:layout_centerHorizontal="true"-->
+    <!--        android:layout_marginTop="30dp"-->
+    <!--        android:gravity="center_horizontal"-->
+    <!--        android:text="TOTAL CLASS"-->
+    <!--        android:textColor="#ff0000"-->
+    <!--        android:textSize="25dp"-->
+    <!--        android:textStyle="bold" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/barcodescan"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="30dp"-->
+    <!--        android:layout_below="@+id/mytotalclass"-->
+    <!--        android:layout_centerHorizontal="true"-->
+    <!--        android:layout_marginTop="30dp"-->
+    <!--        android:gravity="center_horizontal"-->
+    <!--        android:text="qwe"-->
+    <!--        android:textColor="#000000"-->
+    <!--        android:textSize="15dp"-->
+    <!--        android:textStyle="bold" />-->
+
+
+    <!--</LinearLayout>-->

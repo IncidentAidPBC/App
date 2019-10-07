@@ -1,0 +1,88 @@
+<resources>
+    <string name="app_name" parent="Theme.AppCompat.Light.DarkActionBar">IncidentAid</string>
+
+    <string-array name="assigned_roles">
+        <item>Select Role</item>
+        <item>Incident Commander</item>
+        <item>Captain</item>
+        <item>Personnel</item>
+    </string-array>
+
+    <string-array name="parstatus">
+        <item>E1 : RECEIVED</item>
+        <item>E2 : ACK</item>
+        <item>E3 : ACK</item>
+    </string-array>
+
+    <string-array name="rescuestatus">
+        <item>E1 : IN PROGRESS</item>
+        <item>E4 : DONE</item>
+    </string-array>
+
+    <string-array name="notification">
+        <item>11:30 - ENGINE E1 - ACK</item>
+        <item>11:33 - ENGINE E4 - REQ</item>
+        <item>11:34 - ENGINE E3 - ACK</item>
+        <item>11:35 - ENGINE E5 - MAYDAY</item>
+        <item>11:40 - ENGINE E2 - UTILITIES REQ</item>
+        <item>11:59 - ENGINE E1 - RESCUE ACK</item>
+    </string-array>
+
+    <string-array name="incident_type">
+        <item>Incident 1</item>
+        <item>Incident 2</item>
+        <item>Incident 3</item>
+        <item>Incident 4</item>
+        <item>Incident 5</item>
+        <item>Incident 6</item>
+        <item>Incident 7</item>
+        <item>Incident 8</item>
+    </string-array>
+
+    <string-array name="person">
+        <item>Person 1</item>
+        <item>Person 2</item>
+        <item>Person 3</item>
+        <item>Person 4</item>
+        <item>Person 5</item>
+        <item>Person 6</item>
+        <item>Person 7</item>
+        <item>Person 8</item>
+    </string-array>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="title_activity_main1">MainActivity1</string>
+    <string name="title_activity_asd">asd</string>
+    <string name="profile">PROFILE</string>
+    <string name="scan_my_present">SCAN MY PRESENT</string>
+    <string name="quickstart_message">Click the SUBSCRIBE TO WEATHER button below to subscribe to the
+        weather topic. Messages sent to the weather topic will be received. The LOG TOKEN button logs the
+        InstanceID token to logcat.</string>
+    <string name="subscribe_to_weather">Subscribe To Weather</string>
+    <string name="log_token">Log Token</string>
+    <string name="msg_subscribed">Subscribed to weather topic</string>
+    <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
+    <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
+    <string name="default_notification_channel_name" translatable="true">Weather</string>
+    <string name="msg_subscribe_failed">Failed to subscribe to weather topic</string>
+    <string name="fcm_message">FCM Message</string>
+
+
+</resources>

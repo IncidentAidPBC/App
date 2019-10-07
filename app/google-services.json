@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "548694334826",
+    "firebase_url": "https://incidentaid-94ce2.firebaseio.com",
+    "project_id": "incidentaid-94ce2",
+    "storage_bucket": "incidentaid-94ce2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:548694334826:android:6788ae5df2bbf0d2279913",
+        "android_client_info": {
+          "package_name": "com.example.incidentaid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "548694334826-10kgspp3shlhfddnpiejav8raqberlpi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.incidentaid",
+            "certificate_hash": "c14277993b9ade62a7e7e410f51e795d8bdd3f88"
+          }
+        },
+        {
+          "client_id": "548694334826-m7nomh0rh2u356viilslrpp39569h35k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1DysmlxFMvYtbBLP4iUoewSdsWmISrQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "548694334826-m7nomh0rh2u356viilslrpp39569h35k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
