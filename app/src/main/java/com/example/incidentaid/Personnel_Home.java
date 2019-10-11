@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,7 +97,8 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
     public static String mypref = "mypref";
     public static SharedPreferences pref, pref1;
     public SharedPreferences.Editor edit;
-    private Button all_clear_b, evacuate_b, mayday_b, par_b, rescue_b, utility_b, status_incident;
+    private ImageButton all_clear_b,evacuate_b, mayday_b, par_b, rescue_b, utility_b;
+    private Button status_incident;
     public static String incident_id_for_personnel, note_for_personnel, notification_id_for_personnel;
     public static String captain_id_for_personnel, inc_date_for_personnel, inc_time_for_personnel;
     public static String inc_lat_for_personnel, inc_long_for_personnel, personnels_id_for_personnel;
@@ -157,12 +159,12 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         name.setText(Login.username.toUpperCase());
         job.setText(Login.jobtitle.toUpperCase());
 
-        all_clear_b = (Button) findViewById(R.id.allclearbut);
-        evacuate_b = (Button) findViewById(R.id.evacuatebut);
-        mayday_b = (Button) findViewById(R.id.maydaybut);
-        par_b = (Button) findViewById(R.id.parbut);
-        rescue_b = (Button) findViewById(R.id.rescuebut);
-        utility_b = (Button) findViewById(R.id.utilitiesbut);
+        all_clear_b = (ImageButton) findViewById(R.id.allclearbut);
+        evacuate_b = (ImageButton) findViewById(R.id.evacuatebut);
+        mayday_b = (ImageButton) findViewById(R.id.maydaybut);
+        par_b = (ImageButton) findViewById(R.id.parbut);
+        rescue_b = (ImageButton) findViewById(R.id.rescuebut);
+        utility_b = (ImageButton) findViewById(R.id.utilitiesbut);
         status_incident = (Button) findViewById(R.id.status);
 
         status_incident.setText("OPEN");
@@ -378,56 +380,57 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
 
                             if (snapshot.child("par").child("status").getValue().toString().equals("true")) {
                                 par_button = "true";
-                                par_b.setBackgroundColor(Color.GREEN);
+                                par_b.setBackgroundResource(R.drawable.par_on);
                             }
                             if (snapshot.child("par").child("status").getValue().toString().equals("false")) {
                                 par_button = "false";
-                                par_b.setBackgroundColor(Color.RED);
+                                par_b.setBackgroundResource(R.drawable.par_off);
                             }
 
                             if (snapshot.child("all_clear").child("status").getValue().toString().equals("true")) {
                                 all_clear_button = "true";
-                                all_clear_b.setBackgroundColor(Color.GREEN);
+                                all_clear_b.setBackgroundResource(R.drawable.all_clear_on);
                             }
                             if (snapshot.child("all_clear").child("status").getValue().toString().equals("false")) {
                                 all_clear_button = "false";
-                                all_clear_b.setBackgroundColor(Color.RED);
+                                all_clear_b.setBackgroundResource(R.drawable.all_clear_off);
                             }
 
                             if (snapshot.child("evacuate").child("status").getValue().toString().equals("true")) {
                                 evacuate_button = "true";
-                                evacuate_b.setBackgroundColor(Color.GREEN);
+                                evacuate_b.setBackgroundResource(R.drawable.eva_on);
+
                             }
                             if (snapshot.child("evacuate").child("status").getValue().toString().equals("false")) {
                                 evacuate_button = "false";
-                                evacuate_b.setBackgroundColor(Color.RED);
+                                evacuate_b.setBackgroundResource(R.drawable.eva_off);
                             }
 
                             if (snapshot.child("utility").child("status").getValue().toString().equals("true")) {
                                 utility_button = "true";
-                                utility_b.setBackgroundColor(Color.GREEN);
+                                utility_b.setBackgroundResource(R.drawable.utility_on);
                             }
                             if (snapshot.child("utility").child("status").getValue().toString().equals("false")) {
                                 utility_button = "false";
-                                utility_b.setBackgroundColor(Color.RED);
+                                utility_b.setBackgroundResource(R.drawable.utility_off);
                             }
 
                             if (snapshot.child("rescue").child("status").getValue().toString().equals("true")) {
                                 rescue_button = "true";
-                                rescue_b.setBackgroundColor(Color.GREEN);
+                                rescue_b.setBackgroundResource(R.drawable.rescue_on);
                             }
                             if (snapshot.child("rescue").child("status").getValue().toString().equals("false")) {
                                 rescue_button = "false";
-                                rescue_b.setBackgroundColor(Color.RED);
+                                rescue_b.setBackgroundResource(R.drawable.rescue_off);
                             }
 
                             if (snapshot.child("mayday").child("status").getValue().toString().equals("true")) {
                                 mayday_button = "true";
-                                mayday_b.setBackgroundColor(Color.GREEN);
+                                mayday_b.setBackgroundResource(R.drawable.mayday_on);
                             }
                             if (snapshot.child("mayday").child("status").getValue().toString().equals("false")) {
                                 mayday_button = "false";
-                                mayday_b.setBackgroundColor(Color.RED);
+                                mayday_b.setBackgroundResource(R.drawable.mayday_off);
                             }
                         }
                     }

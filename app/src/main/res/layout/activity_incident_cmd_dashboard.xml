@@ -119,10 +119,12 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/border"
+                android:layout_marginBottom="5dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <Button
+                <ImageButton
                     android:id="@+id/parbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -132,7 +134,7 @@
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/allclearbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -157,29 +159,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@drawable/border"
                 android:orientation="horizontal"
+                android:layout_marginBottom="5dp"
                 android:weightSum="2">
 
 
-                <Button
+                <ImageButton
                     android:id="@+id/evacuatebut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="EVACUATE"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/utilitiesbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="UTILITY"
                     android:textSize="13dp"
                     android:textStyle="bold" />
+
 
 
                 <!--                <ImageButton-->
@@ -236,27 +239,26 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/border"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
 
-                <Button
+                <ImageButton
                     android:id="@+id/rescuebut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="RESCUE"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/maydaybut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="MAYDAY"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 

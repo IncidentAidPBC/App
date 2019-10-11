@@ -262,7 +262,7 @@ public class Method {
         mDatabase.child(DateandTime).setValue(person);
 
         HashMap map1 = new HashMap();
-        map1.put(DateandTime, "Incident Created And Notification Sent To All");
+        map1.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " Incident Created And Notification Sent To All");
         myRef2.child(DateandTime).updateChildren(map1);
 
 //        HashMap map = new HashMap();

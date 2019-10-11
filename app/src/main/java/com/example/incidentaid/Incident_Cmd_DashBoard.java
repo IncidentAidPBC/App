@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,7 +81,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
     private DatabaseReference myRef1 = FirebaseDatabase.getInstance().getReference("Alert");
     private DatabaseReference myRef2 = FirebaseDatabase.getInstance().getReference("Notification");
     private GoogleMap mMap;
-    private Button all_clear_b, evacuate_b, mayday_b, par_b, rescue_b, utility_b;
+    private ImageButton all_clear_b, evacuate_b, mayday_b, par_b, rescue_b, utility_b;
     LocationRequest mLocationRequest;
     Location mLastLocation;
     GoogleApiClient mGoogleApiClient;
@@ -121,12 +122,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         notification = (Button) findViewById(R.id.notification);
         header = (TextView) findViewById(R.id.header);
 
-        all_clear_b = (Button) findViewById(R.id.allclearbut);
-        evacuate_b = (Button) findViewById(R.id.evacuatebut);
-        mayday_b = (Button) findViewById(R.id.maydaybut);
-        par_b = (Button) findViewById(R.id.parbut);
-        rescue_b = (Button) findViewById(R.id.rescuebut);
-        utility_b = (Button) findViewById(R.id.utilitiesbut);
+        all_clear_b = (ImageButton) findViewById(R.id.allclearbut);
+        evacuate_b = (ImageButton) findViewById(R.id.evacuatebut);
+        mayday_b = (ImageButton) findViewById(R.id.maydaybut);
+        par_b = (ImageButton) findViewById(R.id.parbut);
+        rescue_b = (ImageButton) findViewById(R.id.rescuebut);
+        utility_b = (ImageButton) findViewById(R.id.utilitiesbut);
 
 
         header.setText("INCIDENT COMMANDER: " + Login.username.toUpperCase());
@@ -248,55 +249,55 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                         if (snapshot.getKey().equals("all_clear")) {
                             if (snapshot.child("status").getValue().toString().equals("true")) {
                                 all_clear_button = "true";
-                                all_clear_b.setBackgroundColor(Color.GREEN);
+                                all_clear_b.setBackgroundResource(R.drawable.all_clear_on);
                             } else {
                                 all_clear_button = "false";
-                                all_clear_b.setBackgroundColor(Color.RED);
+                                all_clear_b.setBackgroundResource(R.drawable.all_clear_off);
                             }
                         }
                         if (snapshot.getKey().equals("evacuate")) {
                             if (snapshot.child("status").getValue().toString().equals("true")) {
                                 evacuate_button = "true";
-                                evacuate_b.setBackgroundColor(Color.GREEN);
+                                evacuate_b.setBackgroundResource(R.drawable.eva_on);
                             } else {
                                 evacuate_button = "false";
-                                evacuate_b.setBackgroundColor(Color.RED);
+                                evacuate_b.setBackgroundResource(R.drawable.eva_off);
                             }
                         }
                         if (snapshot.getKey().equals("mayday")) {
                             if (snapshot.child("status").getValue().toString().equals("true")) {
                                 mayday_button = "true";
-                                mayday_b.setBackgroundColor(Color.GREEN);
+                                mayday_b.setBackgroundResource(R.drawable.mayday_on);
                             } else {
                                 mayday_button = "false";
-                                mayday_b.setBackgroundColor(Color.RED);
+                                mayday_b.setBackgroundResource(R.drawable.mayday_off);
                             }
                         }
                         if (snapshot.getKey().equals("par")) {
                             if (snapshot.child("status").getValue().toString().equals("true")) {
                                 par_button = "true";
-                                par_b.setBackgroundColor(Color.GREEN);
+                                par_b.setBackgroundResource(R.drawable.par_on);
                             } else {
                                 par_button = "false";
-                                par_b.setBackgroundColor(Color.RED);
+                                par_b.setBackgroundResource(R.drawable.par_off);
                             }
                         }
                         if (snapshot.getKey().equals("rescue")) {
                             if (snapshot.child("status").getValue().toString().equals("true")) {
                                 rescue_button = "true";
-                                rescue_b.setBackgroundColor(Color.GREEN);
+                                rescue_b.setBackgroundResource(R.drawable.rescue_on);
                             } else {
                                 rescue_button = "false";
-                                rescue_b.setBackgroundColor(Color.RED);
+                                rescue_b.setBackgroundResource(R.drawable.rescue_off);
                             }
                         }
                         if (snapshot.getKey().equals("utility")) {
                             if (snapshot.child("status").getValue().toString().equals("true")) {
                                 utility_button = "true";
-                                utility_b.setBackgroundColor(Color.GREEN);
+                                utility_b.setBackgroundResource(R.drawable.utility_on);
                             } else {
                                 utility_button = "false";
-                                utility_b.setBackgroundColor(Color.RED);
+                                utility_b.setBackgroundResource(R.drawable.utility_off);
                             }
                         }
                     }
@@ -396,7 +397,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "PAR On Alert Sent To All");
+                                                                hm.put(DateandTime,  Login.snapshot_parent + " " + Login.username + " "+"Send " + "PAR On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -440,7 +441,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "PAR off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " "+"Send " + "PAR off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -556,7 +557,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "All Clear On Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "All Clear On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -600,7 +601,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "All Clear off Alert Sent To All");
+                                                                hm.put(DateandTime,  Login.snapshot_parent + " " + Login.username + " "+"Send " +  "All Clear off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -713,7 +714,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Evacuate On Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Evacuate On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -755,7 +756,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Evacuate Off Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Evacuate Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -868,7 +869,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Utility On Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Utility On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -912,7 +913,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Utility Off Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Utility Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -1026,7 +1027,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Rescue On Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Rescue On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -1069,7 +1070,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Rescue Off Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Rescue Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -1182,7 +1183,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Mayday On Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Mayday On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -1226,7 +1227,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, "Mayday Off Alert Sent To All");
+                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Mayday Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }

@@ -93,10 +93,9 @@
             android:layout_marginRight="5dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="2"
+            android:orientation="vertical"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:background="@drawable/border"
-            android:orientation="vertical"
             android:weightSum="3">
 
 
@@ -105,10 +104,12 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/border"
+                android:layout_marginBottom="5dp"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <Button
+                <ImageButton
                     android:id="@+id/parbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -118,7 +119,7 @@
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/allclearbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -143,27 +144,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:background="@drawable/border"
                 android:orientation="horizontal"
+                android:layout_marginBottom="5dp"
                 android:weightSum="2">
 
 
-                <Button
+                <ImageButton
                     android:id="@+id/evacuatebut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="EVACUATE"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/utilitiesbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="UTILITY"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
@@ -222,27 +223,26 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="5dp"
                 android:layout_weight="1"
+                android:background="@drawable/border"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
 
-                <Button
+                <ImageButton
                     android:id="@+id/rescuebut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="RESCUE"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/maydaybut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:text="MAYDAY"
                     android:textSize="13dp"
                     android:textStyle="bold" />
 
@@ -271,138 +271,138 @@
 
 
         <!--        <LinearLayout-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginRight="5dp"-->
-<!--            android:layout_marginBottom="5dp"-->
-<!--            android:layout_weight="2"-->
-<!--            android:background="@drawable/border"-->
-<!--            android:orientation="vertical"-->
-<!--            android:weightSum="3">-->
+        <!--            android:layout_width="0dp"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:layout_marginRight="5dp"-->
+        <!--            android:layout_marginBottom="5dp"-->
+        <!--            android:layout_weight="2"-->
+        <!--            android:background="@drawable/border"-->
+        <!--            android:orientation="vertical"-->
+        <!--            android:weightSum="3">-->
 
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="0dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:weightSum="2">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="0dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                android:weightSum="2">-->
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/parbut"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:backgroundTint="#ffffff"-->
-<!--                    android:scaleType="fitCenter"-->
-<!--                    android:src="@mipmap/par" />-->
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/parbut"-->
+        <!--                    android:layout_width="0dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_margin="5dp"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:backgroundTint="#ffffff"-->
+        <!--                    android:scaleType="fitCenter"-->
+        <!--                    android:src="@mipmap/par" />-->
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/allclearbut"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:backgroundTint="#ffffff"-->
-<!--                    android:scaleType="fitCenter"-->
-<!--                    android:src="@mipmap/allclear" />-->
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/allclearbut"-->
+        <!--                    android:layout_width="0dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_margin="5dp"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:backgroundTint="#ffffff"-->
+        <!--                    android:scaleType="fitCenter"-->
+        <!--                    android:src="@mipmap/allclear" />-->
 
-<!--            </LinearLayout>-->
+        <!--            </LinearLayout>-->
 
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="0dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:weightSum="2">-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="0dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                android:weightSum="2">-->
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/evacuatebut"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:backgroundTint="#ffffff"-->
-<!--                    android:scaleType="fitCenter"-->
-<!--                    android:src="@mipmap/evacuate" />-->
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/evacuatebut"-->
+        <!--                    android:layout_width="0dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_margin="5dp"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:backgroundTint="#ffffff"-->
+        <!--                    android:scaleType="fitCenter"-->
+        <!--                    android:src="@mipmap/evacuate" />-->
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/utilitiesbut"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:backgroundTint="#ffffff"-->
-<!--                    android:scaleType="fitCenter"-->
-<!--                    android:src="@mipmap/utilities" />-->
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/utilitiesbut"-->
+        <!--                    android:layout_width="0dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_margin="5dp"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:backgroundTint="#ffffff"-->
+        <!--                    android:scaleType="fitCenter"-->
+        <!--                    android:src="@mipmap/utilities" />-->
 
-<!--            </LinearLayout>-->
+        <!--            </LinearLayout>-->
 
-<!--&lt;!&ndash;            <LinearLayout&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_height="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_weight="1"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:orientation="horizontal"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:weightSum="2">&ndash;&gt;-->
+        <!--&lt;!&ndash;            <LinearLayout&ndash;&gt;-->
+        <!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;                android:layout_height="0dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;                android:layout_weight="1"&ndash;&gt;-->
+        <!--&lt;!&ndash;                android:orientation="horizontal"&ndash;&gt;-->
+        <!--&lt;!&ndash;                android:weightSum="2">&ndash;&gt;-->
 
-<!--&lt;!&ndash;                <ImageButton&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/crossbut"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_margin="5dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_weight="1"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:clickable="false"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:backgroundTint="#ffffff"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:scaleType="fitCenter"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:src="@mipmap/cross" />&ndash;&gt;-->
+        <!--&lt;!&ndash;                <ImageButton&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:id="@+id/crossbut"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_margin="5dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_weight="1"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:clickable="false"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:backgroundTint="#ffffff"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:scaleType="fitCenter"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:src="@mipmap/cross" />&ndash;&gt;-->
 
-<!--&lt;!&ndash;                <ImageButton&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/verticalbut"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_margin="5dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_weight="1"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:clickable="false"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:backgroundTint="#ffffff"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:scaleType="fitCenter"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:src="@mipmap/vertical" />&ndash;&gt;-->
-
-
-<!--&lt;!&ndash;            </LinearLayout>&ndash;&gt;-->
-
-<!--            <LinearLayout-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="0dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:orientation="horizontal"-->
-<!--                android:weightSum="2">-->
+        <!--&lt;!&ndash;                <ImageButton&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:id="@+id/verticalbut"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_margin="5dp"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:layout_weight="1"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:clickable="false"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:backgroundTint="#ffffff"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:scaleType="fitCenter"&ndash;&gt;-->
+        <!--&lt;!&ndash;                    android:src="@mipmap/vertical" />&ndash;&gt;-->
 
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/rescuebut"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:backgroundTint="#ffffff"-->
-<!--                    android:scaleType="fitCenter"-->
-<!--                    android:src="@mipmap/rescue" />-->
+        <!--&lt;!&ndash;            </LinearLayout>&ndash;&gt;-->
 
-<!--                <ImageButton-->
-<!--                    android:id="@+id/maydaybut"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_margin="5dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:backgroundTint="#ffffff"-->
-<!--                    android:scaleType="fitCenter"-->
-<!--                    android:src="@mipmap/mayday" />-->
-
-<!--            </LinearLayout>-->
+        <!--            <LinearLayout-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="0dp"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:orientation="horizontal"-->
+        <!--                android:weightSum="2">-->
 
 
-<!--        </LinearLayout>-->
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/rescuebut"-->
+        <!--                    android:layout_width="0dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_margin="5dp"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:backgroundTint="#ffffff"-->
+        <!--                    android:scaleType="fitCenter"-->
+        <!--                    android:src="@mipmap/rescue" />-->
+
+        <!--                <ImageButton-->
+        <!--                    android:id="@+id/maydaybut"-->
+        <!--                    android:layout_width="0dp"-->
+        <!--                    android:layout_height="wrap_content"-->
+        <!--                    android:layout_margin="5dp"-->
+        <!--                    android:layout_weight="1"-->
+        <!--                    android:backgroundTint="#ffffff"-->
+        <!--                    android:scaleType="fitCenter"-->
+        <!--                    android:src="@mipmap/mayday" />-->
+
+        <!--            </LinearLayout>-->
+
+
+        <!--        </LinearLayout>-->
 
     </LinearLayout>
 
