@@ -11,6 +11,9 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +54,20 @@ import java.util.List;
 
 public class Captain_DashBoard extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    int ff_length = 11;
+    int para_length = 9;
+    int emt_length = 3;
+    int op_length = 8;
+    int haz_length = 6;
+    int cap_length = 7;
+    String match_ff = "FIREFIGHTER";
+    String match_emt = "EMT";
+    String match_para = "PARAMEDIC";
+    String match_haz = "HAZMAT";
+    String match_op = "OPERATOR";
+    String match_cap = "CAPTAIN";
+
+    private int ff_index, para_index, emt_index, haz_index, cap_index, op_index;
     private Context mContext;
     private Method method;
     private FirebaseAuth mAuth;
@@ -72,7 +89,6 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
     public static String mypref = "mypref";
     public static SharedPreferences pref, pref1;
     public SharedPreferences.Editor edit;
-
 
     private static final String TAG = "MainActivity";
 
@@ -203,17 +219,17 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
                                 if (snapshot.child("captain").getValue().toString().equals(Login.snapshot_parent)) {
                                     if (snapshot.child("status").getValue().toString().equals("open")) {
                                         startActivity(new Intent(Captain_DashBoard.this, Incident_Cmd_DashBoard.class)
-                                                .putExtra("long", snapshot.child("longitude").getValue().toString())
-                                                .putExtra("lat", snapshot.child("latitude").getValue().toString())
-                                                .putExtra("address", snapshot.child("address").getValue().toString())
-                                                .putExtra("captain", snapshot.child("captain").getValue().toString())
-                                                .putExtra("personnel", snapshot.child("personnel").getValue().toString())
-                                                .putExtra("date", snapshot.child("date").getValue().toString())
-                                                .putExtra("note_reference", snapshot.child("note_reference").getValue().toString())
-                                                .putExtra("notification", snapshot.child("notification").getValue().toString())
+                                                        .putExtra("long", snapshot.child("longitude").getValue().toString())
+                                                        .putExtra("lat", snapshot.child("latitude").getValue().toString())
+                                                        .putExtra("address", snapshot.child("address").getValue().toString())
+                                                        .putExtra("captain", snapshot.child("captain").getValue().toString())
+                                                        .putExtra("personnel", snapshot.child("personnel").getValue().toString())
+                                                        .putExtra("date", snapshot.child("date").getValue().toString())
+                                                        .putExtra("note_reference", snapshot.child("note_reference").getValue().toString())
+                                                        .putExtra("notification", snapshot.child("notification").getValue().toString())
 //                                                .putExtra("time", snapshot.child("time").getValue().toString())
 //                                                .putExtra("status", snapshot.child("status").getValue().toString())
-                                                .putExtra("incident_id", snapshot.getKey().toString())
+                                                        .putExtra("incident_id", snapshot.getKey().toString())
 //                                                .putExtra("all_clear", snapshot.child("alert").child("all_clear").getValue().toString())
 //                                                .putExtra("cross_ventilation", snapshot.child("alert").child("cross_ventilation").getValue().toString())
 //                                                .putExtra("evacuate", snapshot.child("alert").child("evacuate").getValue().toString())
@@ -225,36 +241,25 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
                                         );
                                     }
 
-                                    else {
-                                        startActivity(new Intent(Captain_DashBoard.this, Captain_Create_Incident.class)
-                                                .putExtra("username", Login.username)
-                                                .putExtra("FSaddress", Login.firestation)
-                                                .putExtra("long", fire_station_long)
-                                                .putExtra("lat", fire_station_lat)
-                                                .putExtra("id_list", id_list.toString())
-                                                .putExtra("token_list", token_list.toString())
-                                                .putExtra("notification", "")
-                                        );
-                                    }
-
                                 }
                             }
-                        } else {
-                            startActivity(new Intent(Captain_DashBoard.this, Captain_Create_Incident.class)
-                                    .putExtra("username", Login.username)
-                                    .putExtra("FSaddress", Login.firestation)
-                                    .putExtra("long", fire_station_long)
-                                    .putExtra("lat", fire_station_lat)
-                                    .putExtra("id_list", id_list.toString())
-                                    .putExtra("token_list", token_list.toString())
-                                    .putExtra("notification", "")
-                            );
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
+
+                startActivity(new Intent(Captain_DashBoard.this, Captain_Create_Incident.class)
+                        .putExtra("username", Login.username)
+                        .putExtra("FSaddress", Login.firestation)
+                        .putExtra("long", fire_station_long)
+                        .putExtra("lat", fire_station_lat)
+                        .putExtra("id_list", id_list.toString())
+                        .putExtra("token_list", token_list.toString())
+                        .putExtra("notification", "")
+                );
             }
         });
 
@@ -307,18 +312,40 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
                         View view = super.getView(position, convertView, parent);
                         TextView tv = (TextView) view.findViewById(android.R.id.text1);
                         tv.setTextSize(14);
-//                        tv.setTextColor(Color.BLACK);
-                        if (getItem(position).contains("EMT") && getItem(position).contains("FIRE")) {
-                            tv.setTextColor(Color.BLUE);
-                        } else if (getItem(position).contains("Para") && getItem(position).contains("FIRE")) {
-                            tv.setTextColor(Color.RED);
-                        } else {
-                            tv.setTextColor(Color.MAGENTA);
+                        Spannable wordtoSpan = new SpannableString(tv.getText());
+
+                        String temp = getItem(position);
+
+                        ff_index = temp.indexOf(match_ff);
+                        para_index = temp.indexOf(match_para);
+                        op_index = temp.indexOf(match_op);
+                        haz_index = temp.indexOf(match_haz);
+                        cap_index = temp.indexOf(match_cap);
+                        emt_index = temp.indexOf(match_emt);
+
+                        if (emt_index > 0) {
+                            wordtoSpan.setSpan(new ForegroundColorSpan(Color.RED), emt_index, emt_index + emt_length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        if (ff_index > 0) {
+                            wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLACK), ff_index, ff_index + ff_length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        if (haz_index > 0) {
+                            wordtoSpan.setSpan(new ForegroundColorSpan(Color.MAGENTA), haz_index, haz_index + haz_length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        if (op_index > 0) {
+                            wordtoSpan.setSpan(new ForegroundColorSpan(Color.GREEN), op_index, op_index + op_length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        if (para_index > 0) {
+                            wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLUE), para_index, para_index + para_length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
 
+                        tv.setText(wordtoSpan);
+
                         if (position == 0) {
+                            wordtoSpan.setSpan(new ForegroundColorSpan(Color.BLACK), 0, temp.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                             tv.setTypeface(null, Typeface.BOLD);
                             tv.setTextColor(Color.BLACK);
+                            tv.setText(wordtoSpan);
                         }
                         return view;
                     }

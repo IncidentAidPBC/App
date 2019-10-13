@@ -192,7 +192,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() != 0) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        if (snapshot.child("personnel").getValue(String.class).contains(Login.snapshot_parent)) {
+                        if (snapshot.child("personnel").getValue(String.class).contains(Login.snapshot_parent) && snapshot.child("status").getValue(String.class).equals("open")) {
                             Log.e("personnel", snapshot.getKey());
                             incident_id_for_personnel = snapshot.getKey();
                             note_for_personnel = snapshot.child("note_reference").getValue(String.class);
@@ -219,6 +219,9 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                             edit.putString("inc_address_for_personnel", inc_address_for_personnel);
                             edit.commit();
                             Log.e("mapready22", inc_lat_for_personnel + " " + inc_long_for_personnel);
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(),"Sry open incident for you", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -362,7 +365,11 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
             public void onClick(View v) {
                 startActivity(new Intent(Personnel_Home.this, Notification.class)
                         .putExtra("incident_id", incident_id_for_personnel)
-                        .putExtra("notification_id", notification_id_for_personnel));
+                        .putExtra("notification_id", notification_id_for_personnel)
+                        .putExtra("cap_id", captain_id_for_personnel)
+
+
+                );
             }
         });
         SupportMapFragment mapFragment = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
@@ -1496,7 +1503,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         if (id == R.id.profile) {
             startActivity(new Intent(Personnel_Home.this, Profile_Personnel.class).putExtra("filladdress", filladdress).putExtra("fillpincode", fillpincode));
         } else if (id == R.id.history) {
-            startActivity(new Intent(Personnel_Home.this, Incident_History.class).putExtra("username", Login.username));
+//            startActivity(new Intent(Personnel_Home.this, Incident_History.class).putExtra("username", Login.username));
         } else if (id == R.id.logout) {
 
             AlertDialog.Builder builder;

@@ -27,7 +27,7 @@ import java.util.List;
 public class Notification extends AppCompatActivity {
 
 
-    private String incident_id, notification_id;
+    private String incident_id, notification_id, cap_id;
     TextView header;
     private DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("Notification");
     ListView noti;
@@ -48,18 +48,17 @@ public class Notification extends AppCompatActivity {
         Intent intent = getIntent();
         incident_id = intent.getStringExtra("incident_id");
         notification_id = intent.getStringExtra("notification_id");
-
+        cap_id = intent.getStringExtra("cap_id");
 
         noti = (ListView) findViewById(R.id.all_notification);
         header = (TextView) findViewById(R.id.header);
-        header.setText("INCIDENT CAMMANDER: "+ Login.username.toUpperCase());
+        header.setText("INCIDENT CAMMANDER: " + Login.username.toUpperCase());
 
         if (Login.who_is_the_user.equals("captain")) {
             header.setText("INCIDENT COMMANDER: " + Login.username.toUpperCase());
         } else {
             header.setText("PERSONNEL: " + Login.username.toUpperCase());
         }
-
 
 
         myRef.orderByKey().addListenerForSingleValueEvent(new ValueEventListener() {
@@ -75,13 +74,15 @@ public class Notification extends AppCompatActivity {
                 }
 
                 String temp = product.get(0);
-                temp = temp.replaceAll("\\{","");
-                temp = temp.replaceAll("\\}","");
+                temp = temp.replaceAll("\\{", "");
+                temp = temp.replaceAll("\\}", "");
 
                 String arr[] = temp.split(", ");
                 List l = new ArrayList();
                 for (String str : arr) {
-                    l.add(str);
+                    if (str.contains(cap_id) || str.contains(Login.snapshot_parent)) {
+                        l.add(str);
+                    }
                 }
                 Collections.sort(l);
                 Log.e("List", l.toString());

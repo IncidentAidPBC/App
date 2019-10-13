@@ -66,10 +66,11 @@
         <activity android:name=".Single_item" />
         <activity android:name=".Recruit" />
         <activity android:name=".Captain_DashBoard" />
-        <activity android:name=".Incident_History" />
         <activity android:name=".StreetView" />
         <activity android:name=".Incident_Cmd_Noti_DashBoard" />
-        <activity android:name=".Personnel_Home_No_Incident" />
+        <activity android:name=".No_Incident" />
+        <activity android:name=".Incident_History" />
+        <activity android:name=".Incident_History_Single_View" />
 
         <service
             android:name=".MyFirebaseMessagingService"

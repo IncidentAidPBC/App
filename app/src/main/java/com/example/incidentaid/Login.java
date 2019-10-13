@@ -43,7 +43,7 @@ public class Login extends AppCompatActivity {
     public SharedPreferences.Editor edit;
     private DatabaseReference myref = FirebaseDatabase.getInstance().getReference("User");
     private FirebaseAuth mAuth;
-    private String eemail, ppassword, path;
+    private String eemail, ppassword, path, userid;
     private DatabaseReference userinfo;
     DatabaseReference ref = FirebaseDatabase.getInstance().getReference("User");
 
@@ -71,10 +71,37 @@ public class Login extends AppCompatActivity {
                             if (snapshot.child("email").getValue().toString().equals(mAuth.getCurrentUser().getEmail())) {
                                 Log.e("qweqweqwe", snapshot.child("role").getValue().toString());
                                 path = snapshot.child("role").getValue(String.class);
+                                userid = snapshot.getKey();
+
                                 if (path.equals("captain")) {
                                     startActivity(new Intent(Login.this, Captain_DashBoard.class));
                                 } else {
-                                    startActivity(new Intent(Login.this, Personnel_Home.class));
+
+                                    FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.getChildrenCount() != 0) {
+                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                    Log.e("personnel", snapshot.toString());
+
+                                                    if (snapshot.child("personnel").getValue(String.class).contains(userid) && snapshot.child("status").getValue(String.class).equals("open")) {
+                                                        Log.e("personnel123", snapshot.toString());
+                                                        Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
+                                                        startActivity(new Intent(Login.this, Personnel_Home.class));
+                                                    }
+                                                }
+
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                                    startActivity(new Intent(Login.this, No_Incident.class));
+
                                 }
                             }
                         }
@@ -193,48 +220,24 @@ public class Login extends AppCompatActivity {
                                                         if (who_is_the_user.equals("captain")) {
                                                             HashMap map = new HashMap();
                                                             map.put("token", token);
-                                                            Log.e("shubham", token);
+                                                            Log.e("shubham1", token);
                                                             userinfo.child(Login.snapshot_parent).updateChildren(map);
                                                             Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(Login.this, Captain_DashBoard.class);
                                                             startActivity(intent);
                                                         } else {
 
-                                                            HashMap map = new HashMap();
-                                                            map.put("token", token);
-                                                            Log.e("shubham", token);
-                                                            userinfo.child(Login.snapshot_parent).updateChildren(map);
 
                                                             Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
-                                                            Intent intent = new Intent(Login.this, Personnel_Home.class);
-                                                            startActivity(intent);
 
-//                                                            FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
-//                                                                @Override
-//                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                                                                    if (dataSnapshot.getChildrenCount() != 0) {
-//                                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-//                                                                            if (snapshot.child("status").getValue(String.class).equals("open") && snapshot.child("personnel").getValue(String.class).contains(Login.snapshot_parent)) {
-//
-//                                                                                Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
-//                                                                                Intent intent = new Intent(Login.this, Personnel_Home.class);
-//                                                                                startActivity(intent);
-//
-//                                                                            } else {
-//
-//                                                                                Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
-//                                                                                Intent intent = new Intent(Login.this, Personnel_Home_No_Incident.class);
-//                                                                                startActivity(intent);
-//                                                                            }
-//                                                                        }
-//                                                                    }
-//                                                                }
-//
-//                                                                @Override
-//                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//                                                                }
-//                                                            });
+
+                                                            HashMap map = new HashMap();
+                                                            map.put("token", token);
+                                                            Log.e("shubham2", token);
+                                                            userinfo.child(Login.snapshot_parent).updateChildren(map);
+
+                                                            Intent intent = new Intent(Login.this, No_Incident.class);
+                                                            startActivity(intent);
                                                         }
                                                     }
                                                 }
