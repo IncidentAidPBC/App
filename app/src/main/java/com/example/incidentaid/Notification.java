@@ -43,12 +43,12 @@ public class Notification extends AppCompatActivity {
 
         Login.username = Login.pref.getString("username", null);
         Login.who_is_the_user = Login.pref.getString("user_role", null);
+        Login.snapshot_parent = Login.pref.getString("user_id", null);
 
 
         Intent intent = getIntent();
         incident_id = intent.getStringExtra("incident_id");
         notification_id = intent.getStringExtra("notification_id");
-        cap_id = intent.getStringExtra("cap_id");
 
         noti = (ListView) findViewById(R.id.all_notification);
         header = (TextView) findViewById(R.id.header);
@@ -77,17 +77,31 @@ public class Notification extends AppCompatActivity {
                 temp = temp.replaceAll("\\{", "");
                 temp = temp.replaceAll("\\}", "");
 
+                Log.e("notification", cap_id +" " + Login.snapshot_parent);
                 String arr[] = temp.split(", ");
                 List l = new ArrayList();
+
                 for (String str : arr) {
-                    if (str.contains(cap_id) || str.contains(Login.snapshot_parent)) {
+//                    if (str.contains(cap_id) || str.contains(Login.snapshot_parent)) {
                         l.add(str);
-                    }
+//                    }
                 }
                 Collections.sort(l);
+                Collections.reverse(l);
+
+                List<String> ll = new ArrayList();
+                for(int i = 0 ; i<l.size();i++){
+                    ll.add(l.get(i).toString().split(" ",2)[1]);
+                }
+
+
+
+
+
+
                 Log.e("List", l.toString());
 
-                arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, l) {
+                arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ll) {
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
                         View view = super.getView(position, convertView, parent);

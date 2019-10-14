@@ -145,7 +145,7 @@ public class Recruit extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<String> product = new ArrayList<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    product.add(snapshot.getKey());
+                    product.add(snapshot.getKey() + " " + snapshot.child("Address").getValue(String.class));
                 }
 
                 String[] products = new String[product.size()];
@@ -200,7 +200,7 @@ public class Recruit extends AppCompatActivity {
                 });
 
                 mBuilder.setCancelable(false);
-                mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                mBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         String item = "";
@@ -222,7 +222,7 @@ public class Recruit extends AppCompatActivity {
                     }
                 });
 
-                mBuilder.setNeutralButton("All Clear", new DialogInterface.OnClickListener() {
+                mBuilder.setNeutralButton("Clear", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         for (int i = 0; i < checkedItems.length; i++) {
@@ -256,7 +256,7 @@ public class Recruit extends AppCompatActivity {
                 });
 
                 mBuilder.setCancelable(false);
-                mBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                mBuilder.setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         String item = "";
@@ -278,7 +278,7 @@ public class Recruit extends AppCompatActivity {
                     }
                 });
 
-                mBuilder.setNeutralButton("All Clear", new DialogInterface.OnClickListener() {
+                mBuilder.setNeutralButton("Clear", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         for (int i = 0; i < checkedItems1.length; i++) {
@@ -305,7 +305,7 @@ public class Recruit extends AppCompatActivity {
                 eemail = email.getText().toString().trim();
                 qqualification = selected_qualification.getText().toString();
                 jjob_title = selected_job_title.getText().toString();
-                ffirestation = firestation.getSelectedItem().toString();
+                ffirestation = firestation.getSelectedItem().toString().substring(0,14);
 
 
                 Log.e("123", jjob_title);
@@ -399,9 +399,9 @@ public class Recruit extends AppCompatActivity {
                 } else {
                     builder = new AlertDialog.Builder(Recruit.this);
                 }
-                builder.setTitle("Confirmation To Store Data !!")
-                        .setMessage("Do you want to register the data ?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                builder.setTitle("Confirmation")
+                        .setMessage("Save the Personnel Information ?")
+                        .setPositiveButton("REGISTER", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 register.setEnabled(false);
                                 Log.e("qweqweqweqwe", qqualification);
@@ -484,6 +484,7 @@ public class Recruit extends AppCompatActivity {
                                 });
                             }
                         })
+                        .setNegativeButton("CANCEL", null)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
 

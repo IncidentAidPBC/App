@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:text="Qualification" />
+                android:text="Qualifications" />
 
             <TextView
                 android:id="@+id/selected_qualification"
@@ -130,7 +130,7 @@
                 android:layout_centerVertical="true"
                 android:ellipsize="end"
                 android:gravity="center"
-                android:hint="Selected Qualification"
+                android:hint="Selected Qualifications"
                 android:textSize="10sp" />
 
 

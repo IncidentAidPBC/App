@@ -236,8 +236,36 @@ public class Login extends AppCompatActivity {
                                                             Log.e("shubham2", token);
                                                             userinfo.child(Login.snapshot_parent).updateChildren(map);
 
-                                                            Intent intent = new Intent(Login.this, No_Incident.class);
-                                                            startActivity(intent);
+
+                                                            FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                    if (dataSnapshot.getChildrenCount() != 0) {
+                                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                                            Log.e("personnel", snapshot.toString());
+
+                                                                            if (snapshot.child("personnel").getValue(String.class).contains(snapshot_parent) && snapshot.child("status").getValue(String.class).equals("open")) {
+                                                                                Log.e("personnel123", snapshot.toString());
+                                                                                Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
+                                                                                startActivity(new Intent(Login.this, Personnel_Home.class));
+                                                                            }
+                                                                        }
+
+                                                                    }
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+
+                                                            startActivity(new Intent(Login.this, No_Incident.class));
+
+
+//
+//                                                            Intent intent = new Intent(Login.this, No_Incident.class);
+//                                                            startActivity(intent);
                                                         }
                                                     }
                                                 }

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -31,7 +32,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -50,6 +54,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Captain_DashBoard extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -67,6 +73,7 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
     String match_op = "OPERATOR";
     String match_cap = "CAPTAIN";
 
+    private Timer myTimer1;
     private int ff_index, para_index, emt_index, haz_index, cap_index, op_index;
     private Context mContext;
     private Method method;
@@ -89,6 +96,7 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
     public static String mypref = "mypref";
     public static SharedPreferences pref, pref1;
     public SharedPreferences.Editor edit;
+    private FusedLocationProviderClient fusedLocationClient;
 
     private static final String TAG = "MainActivity";
 
@@ -123,6 +131,7 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
         all_people = (ListView) findViewById(R.id.all_people);
         on_duty = (ListView) findViewById(R.id.on_duty);
         title.setText("CAPTAIN: " + Login.username.toUpperCase());
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = getString(R.string.default_notification_channel_id);
@@ -368,6 +377,16 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
             }
         });
 
+        myTimer1 = new Timer();
+        myTimer1.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                last_know_location();
+            }
+        }, 0, 15000);
+
+
+
 
         all_people.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -493,6 +512,27 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
                         .show();
             }
         });
+    }
+
+    private void last_know_location() {
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+
+                            HashMap map = new HashMap<>();
+                            map.put("last_latitude", location.getLatitude() + "");
+                            map.put("last_longitude", location.getLongitude() + "");
+                            FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
+
+
+                        }
+                    }
+                });
     }
 
     private void findUser() {

@@ -85,8 +85,8 @@ public class Method {
         } else {
             builder = new AlertDialog.Builder(mContext);
         }
-        builder.setTitle("Recruit ID")
-                .setMessage("Remember the ID: " + n + "")
+        builder.setTitle("New Employee Added")
+                .setMessage("Employee ID : " + n)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                     }

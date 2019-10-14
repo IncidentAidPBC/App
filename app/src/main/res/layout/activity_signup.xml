@@ -46,7 +46,7 @@
                 android:backgroundTint="#F44336"
                 android:ems="12"
                 android:gravity="center"
-                android:hint="Unique ID"
+                android:hint="Employee ID"
                 android:inputType="number" />
 
         </TableRow>

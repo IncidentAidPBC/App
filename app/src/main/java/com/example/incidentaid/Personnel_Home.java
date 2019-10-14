@@ -1,6 +1,7 @@
 package com.example.incidentaid;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -38,6 +39,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.internal.OnConnectionFailedListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -51,6 +53,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -84,7 +87,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         OnMapReadyCallback, LocationListener, OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private Timer myTimer;
+    private Timer myTimer, myTimer1;
     private Context myContext;
     private Method method;
     private FirebaseAuth auth;
@@ -97,7 +100,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
     public static String mypref = "mypref";
     public static SharedPreferences pref, pref1;
     public SharedPreferences.Editor edit;
-    private ImageButton all_clear_b,evacuate_b, mayday_b, par_b, rescue_b, utility_b;
+    private ImageButton all_clear_b, evacuate_b, mayday_b, par_b, rescue_b, utility_b;
     private Button status_incident;
     public static String incident_id_for_personnel, note_for_personnel, notification_id_for_personnel;
     public static String captain_id_for_personnel, inc_date_for_personnel, inc_time_for_personnel;
@@ -112,6 +115,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
     LatLng p1 = null; //new LatLng(37.350870, -121.933775);
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MainActivity";
+    private FusedLocationProviderClient fusedLocationClient;
 
 
     @Override
@@ -219,9 +223,8 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                             edit.putString("inc_address_for_personnel", inc_address_for_personnel);
                             edit.commit();
                             Log.e("mapready22", inc_lat_for_personnel + " " + inc_long_for_personnel);
-                        }
-                        else{
-                            Toast.makeText(getApplicationContext(),"Sry open incident for you", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Sry open incident for you", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -267,6 +270,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
 
         title = (TextView) findViewById(R.id.title);
         title.setText("PERSONNEL: " + Login.username.toUpperCase());
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 // Create channel to show notifications.
@@ -316,6 +320,14 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                 check_pending_alert_for_ack();
             }
         }, 0, 5000);
+
+        myTimer1 = new Timer();
+        myTimer1.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                last_know_location();
+            }
+        }, 0, 15000);
 
 
         note.setOnClickListener(new View.OnClickListener() {
@@ -374,6 +386,26 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         });
         SupportMapFragment mapFragment = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    private void last_know_location() {
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+
+                            HashMap map = new HashMap<>();
+                            map.put("last_latitude", location.getLatitude() + "");
+                            map.put("last_longitude", location.getLongitude() + "");
+                            FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
+
+
+                        }
+                    }
+                });
     }
 
     private void check_pending_alert_for_ack() {
@@ -1558,8 +1590,23 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                 if (dataSnapshot.getChildrenCount() != 0) {
                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                            String token = snapshot.child("token").getValue(String.class);
-                                            method.sendFCMPush("MAYDAY MAYDAY", Login.snapshot_parent + " " + Login.username.toUpperCase() + " " + "Need Help ASAP", token);
+                                            final String token = snapshot.child("token").getValue(String.class);
+
+                                            fusedLocationClient.getLastLocation()
+                                                    .addOnSuccessListener((Activity) myContext, new OnSuccessListener<Location>() {
+                                                        @Override
+                                                        public void onSuccess(Location location) {
+                                                            if (location != null) {
+                                                                method.sendFCMPush("MAYDAY MAYDAY", Login.snapshot_parent + " " + Login.username.toUpperCase() + " " + "Need Help ASAP" + " Location: " + location.getLatitude() + " " + location.getLongitude(), token);
+
+                                                            }
+                                                        }
+                                                    });
+
+
+                                            HashMap hm = new HashMap();
+                                            hm.put(incident_id_for_personnel, Login.snapshot_parent + " " + Login.username.toUpperCase() + " Send Mayday To Incident Commander");
+                                            myRef2.child(incident_id_for_personnel).updateChildren(hm);
 
                                         }
                                     }

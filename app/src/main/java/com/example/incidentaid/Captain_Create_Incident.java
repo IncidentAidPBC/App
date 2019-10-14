@@ -33,6 +33,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.internal.OnConnectionFailedListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -51,6 +52,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
 import com.google.android.gms.maps.model.StreetViewPanoramaOrientation;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,6 +72,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Captain_Create_Incident extends AppCompatActivity implements OnMapReadyCallback, OnStreetViewPanoramaReadyCallback,
         LocationListener, OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
@@ -87,6 +91,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
     private TextView heading;
     GoogleApiClient mGoogleApiClient;
 
+    private Timer myTimer1,myTimer2;
     private GoogleMap mMap;
     private String temp, fs, Cap_address = null, aaddress, llong, llat, id_list, token_list;
     Location mLastLocation;
@@ -100,6 +105,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
     Geocoder coder = new Geocoder(Captain_Create_Incident.this);
     ArrayList<String> product;
     ArrayList markerPoints = new ArrayList();
+    private FusedLocationProviderClient fusedLocationClient;
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
 
@@ -126,6 +132,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
         mContext = Captain_Create_Incident.this;
         method = new Method(mContext);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         address = (EditText) findViewById(R.id.address);
         show = (Button) findViewById(R.id.getmap);
@@ -146,7 +153,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
 
         Log.e("1234", llat + " " + llong);
         p1 = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
-        heading.setText("CAPTAIN: " + temp.toUpperCase());
+        heading.setText("INCIDENT COMMANDER: " + temp.toUpperCase());
 
 
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -154,6 +161,18 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
         }
+
+
+        myTimer1 = new Timer();
+        myTimer1.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                last_know_location();
+            }
+        }, 0, 15000);
+
+
+
 
         show.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -274,6 +293,29 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
 
 
     }
+
+
+
+    private void last_know_location() {
+
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+
+                                HashMap map = new HashMap<>();
+                                map.put("last_latitude", location.getLatitude() + "");
+                                map.put("last_longitude", location.getLongitude() + "");
+                                FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
+
+
+                            }
+                        }
+                    });
+        }
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);

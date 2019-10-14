@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.internal.OnConnectionFailedListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -44,6 +45,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -70,7 +72,7 @@ import java.util.TimerTask;
 public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapReadyCallback, LocationListener, OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private Timer myTimer;
+    private Timer myTimer, myTimer1, myTimer2;
     private Button note, street, dashboard, notification;
     private String llong, llat, adde, note_detail, incident_id, notification_id, all_clear_button, evacuate_button, mayday_button, par_button, rescue_button, utility_button;
 
@@ -88,6 +90,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
     Marker mCurrLocationMarker;
     LatLng p1 = null; //new LatLng(37.350870, -121.933775);
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private FusedLocationProviderClient fusedLocationClient;
 
 
     @Override
@@ -139,6 +142,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         adde = intent.getStringExtra("address");
         incident_id = intent.getStringExtra("incident_id");
         notification_id = intent.getStringExtra("notification");
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
         p1 = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
@@ -150,6 +154,23 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                 setButton();
             }
         }, 0, 2000);
+
+
+        myTimer1 = new Timer();
+        myTimer1.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                last_know_location();
+            }
+        }, 0, 15000);
+
+        myTimer2 = new Timer();
+        myTimer2.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mark_location_personnel();
+            }
+        }, 0, 20000);
 
 
         note.setOnClickListener(new View.OnClickListener() {
@@ -224,7 +245,10 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                 startActivity(new Intent(Incident_Cmd_DashBoard.this, Notification.class)
                         .putExtra("incident_id", incident_id)
-                        .putExtra("notification_id", notification_id));
+                        .putExtra("notification_id", notification_id)
+
+
+                );
             }
         });
 
@@ -237,6 +261,67 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             }
         });
     }
+
+    private void last_know_location() {
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+
+                            HashMap map = new HashMap<>();
+                            map.put("last_latitude", location.getLatitude() + "");
+                            map.put("last_longitude", location.getLongitude() + "");
+                            FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
+
+
+                        }
+                    }
+                });
+    }
+
+    private void mark_location_personnel() {
+
+
+        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    mMap.clear();
+
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String name = snapshot.child("name").getValue(String.class);
+                        double lat = Double.parseDouble(snapshot.child("last_latitude").getValue(String.class));
+                        double lon = Double.parseDouble(snapshot.child("last_longitude").getValue(String.class));
+                        String rol = snapshot.child("role").getValue(String.class);
+                        LatLng scu = new LatLng(lat, lon);
+                        if (rol.equals("captain")) {
+                            mMap.addMarker(new MarkerOptions().position(scu).title("IC "+name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                        }else{
+                            mMap.addMarker(new MarkerOptions().position(scu).title("FR "+name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+
+                        }
+                    }
+                    LatLng origin = new LatLng(Double.parseDouble(Captain_DashBoard.fire_station_lat), Double.parseDouble(Captain_DashBoard.fire_station_long));
+                    mMap.addMarker(new MarkerOptions().position(origin).title("Fire Station").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+                    LatLng end = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
+                    mMap.addMarker(new MarkerOptions().position(end).title("Incident").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    loadmappath();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     private void setButton() {
 
@@ -322,7 +407,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                 }
 
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");
@@ -339,7 +424,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                         continue_fun();
                                                     } else {
                                                         Log.e("SendReceived", "no");
-                                                        method.showalert("Alert", "Not Received ACK From All So Can't Push..");
+                                                        method.showalert("Alert", "Not Received ACK From All So Can't Send..");
                                                     }
                                                 }
                                             }
@@ -397,7 +482,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,  Login.snapshot_parent + " " + Login.username + " "+"Send " + "PAR On Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -441,7 +526,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " "+"Send " + "PAR off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -482,7 +567,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
                 }
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");
@@ -499,7 +584,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                         continue_fun();
                                                     } else {
                                                         Log.e("SendReceived", "no");
-                                                        method.showalert("Alert", "Not Received ACK From All So Can't Push..");
+                                                        method.showalert("Alert", "Not Received ACK From All So Can't Send..");
                                                     }
                                                 }
                                             }
@@ -557,7 +642,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "All Clear On Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -601,7 +686,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,  Login.snapshot_parent + " " + Login.username + " "+"Send " +  "All Clear off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -641,7 +726,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
                 }
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");
@@ -658,7 +743,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                         continue_fun();
                                                     } else {
                                                         Log.e("SendReceived", "no");
-                                                        method.showalert("Alert", "Not Received ACK From All So Can't Push..");
+                                                        method.showalert("Alert", "Not Received ACK From All So Can't Send..");
                                                     }
                                                 }
                                             }
@@ -714,7 +799,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Evacuate On Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -756,7 +841,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Evacuate Off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -795,7 +880,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
                 }
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");
@@ -812,7 +897,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                         continue_fun();
                                                     } else {
                                                         Log.e("SendReceived", "no");
-                                                        method.showalert("Alert", "Not Received ACK From All So Can't Push..");
+                                                        method.showalert("Alert", "Not Received ACK From All So Can't Send..");
                                                     }
                                                 }
                                             }
@@ -869,7 +954,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Utility On Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -913,7 +998,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Utility Off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -953,7 +1038,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
                 }
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");
@@ -970,7 +1055,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                         continue_fun();
                                                     } else {
                                                         Log.e("SendReceived", "no");
-                                                        method.showalert("Alert", "Not Received ACK From All So Can't Push..");
+                                                        method.showalert("Alert", "Not Received ACK From All So Can't Send..");
                                                     }
                                                 }
                                             }
@@ -1027,7 +1112,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Rescue On Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -1070,7 +1155,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Rescue Off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }
@@ -1109,7 +1194,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
                 }
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");
@@ -1126,7 +1211,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                         continue_fun();
                                                     } else {
                                                         Log.e("SendReceived", "no");
-                                                        method.showalert("Alert", "Not Received ACK From All So Can't Push..");
+                                                        method.showalert("Alert", "Not Received ACK From All So Can't Send..");
                                                     }
                                                 }
                                             }
@@ -1182,8 +1267,9 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 }
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
+
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Mayday On Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday On Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             } else {
                                                                 HashMap map = new HashMap();
@@ -1227,7 +1313,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
                                                                 String DateandTime = sdf.format(new Date());
                                                                 HashMap hm = new HashMap();
-                                                                hm.put(DateandTime,   Login.snapshot_parent + " " + Login.username + " "+"Send " + "Mayday Off Alert Sent To All");
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday Off Alert Sent To All");
                                                                 myRef2.child(notification_id).updateChildren(hm);
                                                             }
                                                         }

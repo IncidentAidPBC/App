@@ -49,7 +49,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight=".5"
-            android:text="Show" />
+            android:text="GET MAP" />
 
         <Button
             android:id="@+id/incident_generation"
@@ -59,7 +59,7 @@
             android:layout_marginRight="5dp"
             android:layout_weight=".5"
             android:enabled="false"
-            android:text="Create" />
+            android:text="CREATE INCIDENT" />
 
     </LinearLayout>
 

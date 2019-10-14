@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,6 +39,7 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
     private DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("Alert");
     private DatabaseReference myRef1 = FirebaseDatabase.getInstance().getReference("Notification");
     private DatabaseReference myRef2 = FirebaseDatabase.getInstance().getReference("Incident");
+    HashMap<String, String> map;
 
 
     @Override
@@ -53,6 +56,7 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
 
         mContext = Incident_Cmd_Noti_DashBoard.this;
         method = new Method(mContext);
+        map = new HashMap<>();
 
         header = (TextView) findViewById(R.id.header);
         header.setText("INCIDENT COMMANDER: " + Login.username.toUpperCase());
@@ -65,6 +69,32 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
         rescue_b = (Button) findViewById(R.id.rescuebut);
         utility_b = (Button) findViewById(R.id.utilitiesbut);
         close_incident = (Button) findViewById(R.id.close_incident);
+
+
+        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                ArrayList<String> list;
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    list = new ArrayList<>();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        list.add(snapshot.getKey() + ":" + snapshot.child("name").getValue(String.class));
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        map.put(list.get(i).split(":")[0], list.get(i).split(":")[1]);
+                    }
+                }
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+        Log.e("hashmap", map + "");
+        map.put("1", "A");
+        map.put("0", " ");
 
         par_b.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,11 +111,23 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\{", "");
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
+
                                     Arrays.sort(arr);
+                                    ArrayList<String> namearr = new ArrayList<>();
+
+                                    for (String str : arr) {
+                                        String name = str.split("=")[0];
+                                        String value = str.split("=")[1];
+                                        if(map.containsKey(name))
+                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
+                                    }
+
+                                    String final_result = namearr.toString().replace("[","").replace("]","").replace(", "," | ");
+
                                     if (snapshot.child("par").child("received").getValue().toString().equals(snapshot.child("par").child("send").getValue().toString())) {
-                                        method.showalert("PAR" + " ACK", Arrays.toString(arr));
+                                        method.showalert("PAR" + " ACK", final_result);
                                     } else {
-                                        method.showalert("PAR" + " REC", Arrays.toString(arr));
+                                        method.showalert("PAR" + " REC", final_result);
                                     }
                                 }
                             }
@@ -99,9 +141,11 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
             }
         });
 
+
         all_clear_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.e("hashmap", map + "");
 
                 final Query userQuery = FirebaseDatabase.getInstance().getReference().child("Alert");
                 userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -115,11 +159,23 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
+
+                                    ArrayList<String> namearr = new ArrayList<>();
+
+                                    for (String str : arr) {
+                                        String name = str.split("=")[0];
+                                        String value = str.split("=")[1];
+                                        if(map.containsKey(name))
+                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
+                                    }
+
+                                    String final_result = namearr.toString().replace("[","").replace("]","").replace(", "," | ");
+
                                     if (snapshot.child("all_clear").child("received").getValue().toString().equals(snapshot.child("all_clear").child("send").getValue().toString())) {
-                                        method.showalert("ALL CLEAR" + " ACK", Arrays.toString(arr));
+                                        method.showalert("ALL CLEAR" + " ACK", final_result);
 
                                     } else {
-                                        method.showalert("ALL CLEAR" + " REC", Arrays.toString(arr));
+                                        method.showalert("ALL CLEAR" + " REC", final_result);
                                     }
 
                                 }
@@ -151,10 +207,22 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
+
+                                    ArrayList<String> namearr = new ArrayList<>();
+
+                                    for (String str : arr) {
+                                        String name = str.split("=")[0];
+                                        String value = str.split("=")[1];
+                                        if(map.containsKey(name))
+                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
+                                    }
+
+                                    String final_result = namearr.toString().replace("[","").replace("]","").replace(", "," | ");
+
                                     if (snapshot.child("evacuate").child("received").getValue().toString().equals(snapshot.child("evacuate").child("send").getValue().toString())) {
-                                        method.showalert("EVACUATE" + " ACK", Arrays.toString(arr));
+                                        method.showalert("EVACUATE" + " ACK", final_result);
                                     } else {
-                                        method.showalert("EVACUATE" + " REC", Arrays.toString(arr));
+                                        method.showalert("EVACUATE" + " REC", final_result);
                                     }
                                 }
                             }
@@ -185,10 +253,22 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
+
+                                    ArrayList<String> namearr = new ArrayList<>();
+
+                                    for (String str : arr) {
+                                        String name = str.split("=")[0];
+                                        String value = str.split("=")[1];
+                                        if(map.containsKey(name))
+                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
+                                    }
+
+                                    String final_result = namearr.toString().replace("[","").replace("]","").replace(", "," | ");
+
                                     if (snapshot.child("utility").child("received").getValue().toString().equals(snapshot.child("utility").child("send").getValue().toString())) {
-                                        method.showalert("UTILITY" + " ACK", Arrays.toString(arr));
+                                        method.showalert("UTILITY" + " ACK", final_result);
                                     } else {
-                                        method.showalert("UTILITY" + " REC", Arrays.toString(arr));
+                                        method.showalert("UTILITY" + " REC", final_result);
                                     }
                                 }
                             }
@@ -219,10 +299,22 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
+
+                                    ArrayList<String> namearr = new ArrayList<>();
+
+                                    for (String str : arr) {
+                                        String name = str.split("=")[0];
+                                        String value = str.split("=")[1];
+                                        if(map.containsKey(name))
+                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
+                                    }
+
+                                    String final_result = namearr.toString().replace("[","").replace("]","").replace(", "," | ");
+
                                     if (snapshot.child("rescue").child("received").getValue().toString().equals(snapshot.child("rescue").child("send").getValue().toString())) {
-                                        method.showalert("RESCUE" + " ACK", Arrays.toString(arr));
+                                        method.showalert("RESCUE" + " ACK", final_result);
                                     } else {
-                                        method.showalert("RESCUE" + " REC", Arrays.toString(arr));
+                                        method.showalert("RESCUE" + " REC", final_result);
                                     }
                                 }
                             }
@@ -252,11 +344,25 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\{", "");
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
+
                                     Arrays.sort(arr);
+
+                                    ArrayList<String> namearr = new ArrayList<>();
+
+                                    for (String str : arr) {
+                                        String name = str.split("=")[0];
+                                        String value = str.split("=")[1];
+                                        if(map.containsKey(name))
+                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
+                                    }
+
+                                    String final_result = namearr.toString().replace("[","").replace("]","").replace(", "," | ");
+
+
                                     if (snapshot.child("mayday").child("received").getValue().toString().equals(snapshot.child("mayday").child("send").getValue().toString())) {
-                                        method.showalert("MAYDAY" + " ACK", Arrays.toString(arr));
+                                        method.showalert("MAYDAY" + " ACK", final_result);
                                     } else {
-                                        method.showalert("MAYDAY" + " REC", Arrays.toString(arr));
+                                        method.showalert("MAYDAY" + " REC", final_result);
                                     }
                                 }
                             }
