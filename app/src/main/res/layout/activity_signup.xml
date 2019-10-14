@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_span="2"
-                android:text="REGISTER"
+                android:text="SIGN UP"
                 android:textAlignment="center"
                 android:textColor="#040C0B"
                 android:textSize="30dp"

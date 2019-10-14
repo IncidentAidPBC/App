@@ -224,7 +224,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                             edit.commit();
                             Log.e("mapready22", inc_lat_for_personnel + " " + inc_long_for_personnel);
                         } else {
-                            Toast.makeText(getApplicationContext(), "Sry open incident for you", Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(getApplicationContext(), "Sry open incident for you", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
