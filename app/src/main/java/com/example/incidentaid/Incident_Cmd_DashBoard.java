@@ -195,7 +195,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.getChildrenCount() != 0) {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                if (snapshot.child("captain").getValue(String.class).equals(Login.snapshot_parent)) {
+                                if (snapshot.child("captain").getValue(String.class).equals(Login.snapshot_parent) && snapshot.getKey().equals(incident_id)) {
                                     note.setText(snapshot.child("note_reference").getValue(String.class));
                                 }
                             }
@@ -299,12 +299,26 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                         double lon = Double.parseDouble(snapshot.child("last_longitude").getValue(String.class));
                         String rol = snapshot.child("role").getValue(String.class);
                         LatLng scu = new LatLng(lat, lon);
+
+                        String mayday_lat = snapshot.child("mayday_latitude").getValue(String.class);
+                        String mayday_lon = snapshot.child("mayday_longitude").getValue(String.class);
+
+
                         if (rol.equals("captain")) {
                             mMap.addMarker(new MarkerOptions().position(scu).title("IC "+name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                         }else{
                             mMap.addMarker(new MarkerOptions().position(scu).title("FR "+name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                        }
+
+                        if(mayday_lat != null && mayday_lon != null){
+                            LatLng mayday_latlng = new LatLng(Double.parseDouble(mayday_lat),Double.parseDouble(mayday_lon));
+                            mMap.addMarker(new MarkerOptions().position(mayday_latlng).title("MAYDAY MAYDAY "+name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
 
                         }
+
+
+
+
                     }
                     LatLng origin = new LatLng(Double.parseDouble(Captain_DashBoard.fire_station_lat), Double.parseDouble(Captain_DashBoard.fire_station_long));
                     mMap.addMarker(new MarkerOptions().position(origin).title("Fire Station").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
@@ -312,6 +326,11 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                     LatLng end = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
                     mMap.addMarker(new MarkerOptions().position(end).title("Incident").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                     loadmappath();
+
+
+
+
+
                 }
             }
 
@@ -407,7 +426,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                 }
 
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to Send ?")
+                        .setMessage("Want to Send PAR Command ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.e("helper", "yes");

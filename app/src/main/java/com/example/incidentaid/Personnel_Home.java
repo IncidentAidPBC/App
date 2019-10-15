@@ -560,7 +560,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                 }
 
                 builder.setTitle("Confirmation")
-                        .setMessage("Want to push?")
+                        .setMessage("Want to Send ACK ?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1599,15 +1599,20 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                             if (location != null) {
                                                                 method.sendFCMPush("MAYDAY MAYDAY", Login.snapshot_parent + " " + Login.username.toUpperCase() + " " + "Need Help ASAP" + " Location: " + location.getLatitude() + " " + location.getLongitude(), token);
 
+                                                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+                                                                String DateandTime = sdf.format(new Date());
+
+                                                                HashMap hm = new HashMap();
+                                                                hm.put(DateandTime, Login.snapshot_parent + " " + Login.username.toUpperCase() + " Send Mayday To Incident Commander" + " Location: " + location.getLatitude() + " " + location.getLongitude());
+                                                                myRef4.child(incident_id_for_personnel).updateChildren(hm);
+
+                                                                HashMap map = new HashMap<>();
+                                                                map.put("mayday_latitude", location.getLatitude() + "");
+                                                                map.put("mayday_longitude", location.getLongitude() + "");
+                                                                FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
                                                             }
                                                         }
                                                     });
-
-
-                                            HashMap hm = new HashMap();
-                                            hm.put(incident_id_for_personnel, Login.snapshot_parent + " " + Login.username.toUpperCase() + " Send Mayday To Incident Commander");
-                                            myRef2.child(incident_id_for_personnel).updateChildren(hm);
-
                                         }
                                     }
                                 }
