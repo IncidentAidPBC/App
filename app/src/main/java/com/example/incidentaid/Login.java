@@ -75,8 +75,31 @@ public class Login extends AppCompatActivity {
 
                                 if (path.equals("captain")) {
                                     startActivity(new Intent(Login.this, Captain_DashBoard.class));
-                                } else {
+                                } else if (path.equals("battalion chief")) {
 
+                                    FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.getChildrenCount() != 0) {
+                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                    if (snapshot.child("status").getValue(String.class).equals("open")) {
+                                                        String incident_id_for_personnel = snapshot.getKey();
+                                                        startActivity(new Intent(Login.this, Battalion_Chief_Dashboard.class)
+                                                                .putExtra("incident_id_for_personnel",incident_id_for_personnel)
+                                                        );
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                    startActivity(new Intent(Login.this, No_Incident.class));
+
+                                } else {
                                     FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -225,8 +248,33 @@ public class Login extends AppCompatActivity {
                                                             Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(Login.this, Captain_DashBoard.class);
                                                             startActivity(intent);
-                                                        } else {
+                                                        } else if (who_is_the_user.equals("battalion chief")) {
 
+                                                            FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                    if (dataSnapshot.getChildrenCount() != 0) {
+                                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                                            if (snapshot.child("status").getValue(String.class).equals("open")) {
+                                                                                String incident_id_for_personnel = snapshot.getKey();
+                                                                                startActivity(new Intent(Login.this, Battalion_Chief_Dashboard.class)
+                                                                                .putExtra("incident_id_for_personnel",incident_id_for_personnel)
+                                                                                );
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                                }
+                                                            });
+
+                                                            startActivity(new Intent(Login.this, No_Incident.class));
+
+
+                                                        } else {
 
                                                             Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
 

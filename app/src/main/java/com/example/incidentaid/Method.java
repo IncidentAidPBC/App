@@ -166,9 +166,11 @@ public class Method {
                     public void onClick(DialogInterface dialog, int which) {
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+//                .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
+
+
 
 
     public void sendFCMPush(String noti_title, String noti_msg, String user_token) {
@@ -258,7 +260,7 @@ public class Method {
         personnel = personnel.substring(1, personnel.length());
 
 
-        User person = new User(address, captain, personnel, currentDate, currentTime, lat, longi, note_reference, "open", DateandTime, DateandTime);
+        User person = new User(address, captain, personnel, currentDate, currentTime, lat, longi, note_reference, "open", DateandTime, DateandTime, 0);
         mDatabase.child(DateandTime).setValue(person);
 
         HashMap map1 = new HashMap();

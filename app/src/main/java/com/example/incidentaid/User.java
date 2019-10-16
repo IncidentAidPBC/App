@@ -5,8 +5,16 @@ import java.io.Serializable;
 public class User implements Serializable {
 
     private String name, email, firestation, role, address, pincode, qualification, job_title, alert;
-    private  String token, online, captain, personnel, date, time, notification, latitude, longitude, note_reference, status;
+    private String token, online, captain, personnel, date, time, notification, latitude, longitude, note_reference, status;
+    private int transfer_control;
 
+    public void setTransfer_control(int transfer_control) {
+        this.transfer_control = transfer_control;
+    }
+
+    public int getTransfer_control() {
+        return transfer_control;
+    }
 
     public User(String name, String email, String qualification, String job_title, String address, String pincode, String firestation, String role, String token, String online) {
         this.name = name;
@@ -102,7 +110,7 @@ public class User implements Serializable {
         return alert;
     }
 
-    public User(String address, String captain, String personnel, String date, String time, String latitude, String longitude, String note_reference, String status, String notification, String alert) {
+    public User(String address, String captain, String personnel, String date, String time, String latitude, String longitude, String note_reference, String status, String notification, String alert, int transfer_control) {
         this.address = address;
         this.captain = captain;
         this.personnel = personnel;
@@ -114,6 +122,7 @@ public class User implements Serializable {
         this.status = status;
         this.notification = notification;
         this.alert = alert;
+        this.transfer_control = transfer_control;
     }
 
     public String getQualification() {

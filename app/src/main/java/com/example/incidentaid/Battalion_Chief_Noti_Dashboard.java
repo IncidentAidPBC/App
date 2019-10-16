@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,14 +23,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
+public class Battalion_Chief_Noti_Dashboard extends AppCompatActivity {
 
-    private int transfer_control;
     private String incident_id, notification_id;
     private Button all_clear_b, evacuate_b, mayday_b, par_b, rescue_b, utility_b, close_incident;
     private Context mContext;
@@ -43,25 +40,25 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
     HashMap<String, String> map;
 
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setContentView(R.layout.activity_battalion_chief_noti_dashboard);
 
-        setContentView(R.layout.activity_incident_cmd_noti_dashboard);
 
 
         Intent intent = getIntent();
         incident_id = intent.getStringExtra("incident_id");
         notification_id = intent.getStringExtra("notification");
-        transfer_control = Integer.parseInt(intent.getStringExtra("transfer_control"));
 
-        mContext = Incident_Cmd_Noti_DashBoard.this;
+        mContext = Battalion_Chief_Noti_Dashboard.this;
         method = new Method(mContext);
         map = new HashMap<>();
 
         header = (TextView) findViewById(R.id.header);
-        header.setText("INCIDENT COMMANDER: " + Login.username.toUpperCase());
+        header.setText("Battalion Chief / IC: " + Login.username.toUpperCase());
 
 
         all_clear_b = (Button) findViewById(R.id.allclearbut);
@@ -73,35 +70,10 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
         close_incident = (Button) findViewById(R.id.close_incident);
 
 
-        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<String> list;
-                if (dataSnapshot.getChildrenCount() != 0) {
-                    list = new ArrayList<>();
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        list.add(snapshot.getKey() + ":" + snapshot.child("name").getValue(String.class));
-                    }
-                    for (int i = 0; i < list.size(); i++) {
-                        map.put(list.get(i).split(":")[0], list.get(i).split(":")[1]);
-                    }
-                }
-            }
-
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-            }
-        });
-
-        Log.e("hashmap", map + "");
-        map.put("1", "A");
-        map.put("0", " ");
 
         par_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 final Query userQuery = FirebaseDatabase.getInstance().getReference().child("Alert");
                 userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -116,21 +88,12 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     String arr[] = temp.split(", ");
 
                                     Arrays.sort(arr);
-                                    ArrayList<String> namearr = new ArrayList<>();
-
-                                    for (String str : arr) {
-                                        String name = str.split("=")[0];
-                                        String value = str.split("=")[1];
-                                        if (map.containsKey(name))
-                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
-                                    }
-
-                                    String final_result = namearr.toString().replace("[", "").replace("]", "").replace(", ", " | ");
-
-                                    if (snapshot.child("par").child("received").getValue().toString().equals(snapshot.child("par").child("send").getValue().toString())) {
-                                        method.showalert("PAR" + " ACK", final_result);
+                                    String receive = arr[arr.length-3].split("=")[1];
+                                    String send = arr[arr.length-2].split("=")[1];
+                                    if (receive.equals(send)) {
+                                        method.showalert("PAR" + " ACK", "E3 - A");
                                     } else {
-                                        method.showalert("PAR" + " REC", final_result);
+                                        method.showalert("PAR" + " REC", "E3 - ?");
                                     }
                                 }
                             }
@@ -162,23 +125,12 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
-
-                                    ArrayList<String> namearr = new ArrayList<>();
-
-                                    for (String str : arr) {
-                                        String name = str.split("=")[0];
-                                        String value = str.split("=")[1];
-                                        if (map.containsKey(name))
-                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
-                                    }
-
-                                    String final_result = namearr.toString().replace("[", "").replace("]", "").replace(", ", " | ");
-
-                                    if (snapshot.child("all_clear").child("received").getValue().toString().equals(snapshot.child("all_clear").child("send").getValue().toString())) {
-                                        method.showalert("ALL CLEAR" + " ACK", final_result);
-
+                                    String receive = arr[arr.length-3].split("=")[1];
+                                    String send = arr[arr.length-2].split("=")[1];
+                                    if (receive.equals(send)) {
+                                        method.showalert("All Clear" + " ACK", "E3 - A");
                                     } else {
-                                        method.showalert("ALL CLEAR" + " REC", final_result);
+                                        method.showalert("All Clear" + " REC", "E3 - ?");
                                     }
 
                                 }
@@ -210,24 +162,13 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
-
-                                    ArrayList<String> namearr = new ArrayList<>();
-
-                                    for (String str : arr) {
-                                        String name = str.split("=")[0];
-                                        String value = str.split("=")[1];
-                                        if (map.containsKey(name))
-                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
-                                    }
-
-                                    String final_result = namearr.toString().replace("[", "").replace("]", "").replace(", ", " | ");
-
-                                    if (snapshot.child("evacuate").child("received").getValue().toString().equals(snapshot.child("evacuate").child("send").getValue().toString())) {
-                                        method.showalert("EVACUATE" + " ACK", final_result);
+                                    String receive = arr[arr.length-3].split("=")[1];
+                                    String send = arr[arr.length-2].split("=")[1];
+                                    if (receive.equals(send)) {
+                                        method.showalert("Evacuate" + " ACK", "E3 - A");
                                     } else {
-                                        method.showalert("EVACUATE" + " REC", final_result);
-                                    }
-                                }
+                                        method.showalert("Evacuate" + " REC", "E3 - ?");
+                                    }                                }
                             }
                         }
                     }
@@ -256,22 +197,12 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
-
-                                    ArrayList<String> namearr = new ArrayList<>();
-
-                                    for (String str : arr) {
-                                        String name = str.split("=")[0];
-                                        String value = str.split("=")[1];
-                                        if (map.containsKey(name))
-                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
-                                    }
-
-                                    String final_result = namearr.toString().replace("[", "").replace("]", "").replace(", ", " | ");
-
-                                    if (snapshot.child("utility").child("received").getValue().toString().equals(snapshot.child("utility").child("send").getValue().toString())) {
-                                        method.showalert("UTILITY" + " ACK", final_result);
+                                    String receive = arr[arr.length-3].split("=")[1];
+                                    String send = arr[arr.length-2].split("=")[1];
+                                    if (receive.equals(send)) {
+                                        method.showalert("Utility" + " ACK", "E3 - A");
                                     } else {
-                                        method.showalert("UTILITY" + " REC", final_result);
+                                        method.showalert("Utility" + " REC", "E3 - ?");
                                     }
                                 }
                             }
@@ -302,22 +233,12 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     temp = temp.replaceAll("\\}", "");
                                     String arr[] = temp.split(", ");
                                     Arrays.sort(arr);
-
-                                    ArrayList<String> namearr = new ArrayList<>();
-
-                                    for (String str : arr) {
-                                        String name = str.split("=")[0];
-                                        String value = str.split("=")[1];
-                                        if (map.containsKey(name))
-                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
-                                    }
-
-                                    String final_result = namearr.toString().replace("[", "").replace("]", "").replace(", ", " | ");
-
-                                    if (snapshot.child("rescue").child("received").getValue().toString().equals(snapshot.child("rescue").child("send").getValue().toString())) {
-                                        method.showalert("RESCUE" + " ACK", final_result);
+                                    String receive = arr[arr.length-3].split("=")[1];
+                                    String send = arr[arr.length-2].split("=")[1];
+                                    if (receive.equals(send)) {
+                                        method.showalert("Rescue" + " ACK", "E3 - A");
                                     } else {
-                                        method.showalert("RESCUE" + " REC", final_result);
+                                        method.showalert("Rescue" + " REC", "E3 - ?");
                                     }
                                 }
                             }
@@ -349,23 +270,12 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
                                     String arr[] = temp.split(", ");
 
                                     Arrays.sort(arr);
-
-                                    ArrayList<String> namearr = new ArrayList<>();
-
-                                    for (String str : arr) {
-                                        String name = str.split("=")[0];
-                                        String value = str.split("=")[1];
-                                        if (map.containsKey(name))
-                                            namearr.add(map.get(name).toUpperCase() + "  " + map.get(value));
-                                    }
-
-                                    String final_result = namearr.toString().replace("[", "").replace("]", "").replace(", ", " | ");
-
-
-                                    if (snapshot.child("mayday").child("received").getValue().toString().equals(snapshot.child("mayday").child("send").getValue().toString())) {
-                                        method.showalert("MAYDAY" + " ACK", final_result);
+                                    String receive = arr[arr.length-3].split("=")[1];
+                                    String send = arr[arr.length-2].split("=")[1];
+                                    if (receive.equals(send)) {
+                                        method.showalert("Mayday" + " ACK", "E3 - A");
                                     } else {
-                                        method.showalert("MAYDAY" + " REC", final_result);
+                                        method.showalert("Mayday" + " REC", "E3 - ?");
                                     }
                                 }
                             }
@@ -384,64 +294,57 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(transfer_control == 0) {
 
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_Noti_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_Noti_DashBoard.this);
-                    }
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to close the incident?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(Battalion_Chief_Noti_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(Battalion_Chief_Noti_Dashboard.this);
+                }
+                builder.setTitle("Confirmation")
+                        .setMessage("Want to close the incident?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
 
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                    String DateandTime = sdf.format(new Date());
-                                    HashMap hm = new HashMap();
-                                    hm.put(DateandTime, "Incident Commander Close The Incident");
-                                    FirebaseDatabase.getInstance().getReference("Notification").child(incident_id).updateChildren(hm);
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+                                String DateandTime = sdf.format(new Date());
+                                HashMap hm = new HashMap();
+                                hm.put(DateandTime, "BC / Incident Commander Close The Incident");
+                                FirebaseDatabase.getInstance().getReference("Notification").child(incident_id).updateChildren(hm);
 
-                                    HashMap hm1 = new HashMap();
-                                    hm1.put("status", "close");
-                                    FirebaseDatabase.getInstance().getReference("Incident").child(incident_id).updateChildren(hm1);
+                                HashMap hm1 = new HashMap();
+                                hm1.put("status", "close");
+                                FirebaseDatabase.getInstance().getReference("Incident").child(incident_id).updateChildren(hm1);
 
 
-                                    FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    HashMap reset_mayday = new HashMap();
-                                                    reset_mayday.put("mayday_latitude", null);
-                                                    reset_mayday.put("mayday_longitude", null);
-                                                    FirebaseDatabase.getInstance().getReference("User").child(snapshot.getKey()).updateChildren(reset_mayday);
-                                                }
+                                FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if(dataSnapshot.getChildrenCount()!=0){
+                                            for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                                                HashMap reset_mayday = new HashMap();
+                                                reset_mayday.put("mayday_latitude",null);
+                                                reset_mayday.put("mayday_longitude",null);
+                                                FirebaseDatabase.getInstance().getReference("User").child(snapshot.getKey()).updateChildren(reset_mayday);
                                             }
                                         }
+                                    }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                        }
-                                    });
+                                    }
+                                });
 
-                                    startActivity(new Intent(Incident_Cmd_Noti_DashBoard.this, Captain_DashBoard.class));
+//                                startActivity(new Intent(Battalion_Chief_Noti_Dashboard.this, Captain_DashBoard.class));
 
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-                            .show();
-
-                }else{
-                    method.showalert("Warning Cant Send Cmd","You are not authorized");
-                }
-
-
-                }
-            });
-
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
 
 
     }

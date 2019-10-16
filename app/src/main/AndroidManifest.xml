@@ -71,6 +71,8 @@
         <activity android:name=".No_Incident" />
         <activity android:name=".Incident_History" />
         <activity android:name=".Incident_History_Single_View" />
+        <activity android:name=".Battalion_Chief_Dashboard" />
+        <activity android:name=".Battalion_Chief_Noti_Dashboard" />
 
         <service
             android:name=".MyFirebaseMessagingService"

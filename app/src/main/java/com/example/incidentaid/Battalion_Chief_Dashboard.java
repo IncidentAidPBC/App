@@ -2,9 +2,11 @@ package com.example.incidentaid;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -13,12 +15,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,12 +44,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONObject;
 
@@ -69,61 +74,82 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapReadyCallback, LocationListener, OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
+public class Battalion_Chief_Dashboard extends AppCompatActivity implements OnMapReadyCallback, LocationListener, OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private Timer myTimer, myTimer1, myTimer2;
-    private Button note, street, dashboard, notification;
-    private String llong, llat, adde, note_detail, incident_id, notification_id, all_clear_button, evacuate_button, mayday_button, par_button, rescue_button, utility_button;
 
-    private TextView header;
-    private Context mContext;
+    private Timer myTimer, myTimer1, myTimer2;
+    private Context myContext;
     private Method method;
-    private DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("Incident");
-    private DatabaseReference myRef1 = FirebaseDatabase.getInstance().getReference("Alert");
-    private DatabaseReference myRef2 = FirebaseDatabase.getInstance().getReference("Notification");
-    private GoogleMap mMap;
+    private FirebaseAuth auth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference myRef, myRef1, myRef2, myRef3, myRef4;
+    public static String mypref = "mypref";
+    public static SharedPreferences pref, pref1;
+    public SharedPreferences.Editor edit;
+    private TextView header;
     private ImageButton all_clear_b, evacuate_b, mayday_b, par_b, rescue_b, utility_b;
+    private Button noti_dash, take_cmd;
+    private GoogleMap mMap;
     LocationRequest mLocationRequest;
     Location mLastLocation;
     GoogleApiClient mGoogleApiClient;
     Marker mCurrLocationMarker;
     LatLng p1 = null; //new LatLng(37.350870, -121.933775);
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+    private static final String TAG = "MainActivity";
     private FusedLocationProviderClient fusedLocationClient;
+
+    public static String incident_id_for_personnel, note_for_personnel, notification_id_for_personnel;
+    public static String captain_id_for_personnel, inc_date_for_personnel, inc_time_for_personnel;
+    public static String inc_lat_for_personnel, inc_long_for_personnel, personnels_id_for_personnel;
+    public static String inc_status_for_personnel, inc_address_for_personnel, token;
+    public String cur_lat, cur_lon;
+    private String all_clear_button, evacuate_button, mayday_button, par_button, rescue_button, utility_button;
     public int transfer_control;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_incident_cmd_dashboard);
-
-        Login.username = Login.pref.getString("username", null);
-        Captain_DashBoard.fire_station_long = Captain_DashBoard.pref.getString("fire_station_long", null);
-        Captain_DashBoard.fire_station_lat = Captain_DashBoard.pref.getString("fire_station_lan", null);
-
-//        Captain_Create_Incident.inc_lat = Captain_Create_Incident.pref.getString("inc_lat",null);
-//
-//        Log.e("office2",Captain_Create_Incident.inc_lat+"");
+        setContentView(R.layout.activity_battalion_chief);
 
 
-        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) this.getSupportFragmentManager().findFragmentById(R.id.map);
+
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             buildAlertMessageNoGps();
         }
 
+        myContext = Battalion_Chief_Dashboard.this;
+        method = new Method(myContext);
+        pref = getSharedPreferences(mypref, MODE_PRIVATE);
+        edit = pref.edit();
 
-        mContext = Incident_Cmd_DashBoard.this;
-        method = new Method(mContext);
-        note = (Button) findViewById(R.id.note);
-        street = (Button) findViewById(R.id.street);
-        dashboard = (Button) findViewById(R.id.dashboard);
-        notification = (Button) findViewById(R.id.notification);
-        header = (TextView) findViewById(R.id.header);
+        auth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        myRef = FirebaseDatabase.getInstance().getReference("User");
+        myRef1 = FirebaseDatabase.getInstance().getReference("Incident");
+        myRef2 = FirebaseDatabase.getInstance().getReference("Fire_Station");
+        myRef3 = FirebaseDatabase.getInstance().getReference("Alert");
+        myRef4 = FirebaseDatabase.getInstance().getReference("Notification");
+
+
+        Login.username = Login.pref.getString("username", null);
+        Login.snapshot_parent = Login.pref.getString("user_id", null);
+        Login.firestation = Login.pref.getString("firestation", null);
+        Login.jobtitle = Login.pref.getString("jobtitle", null);
+        Login.values_for_profile = Login.pref.getString("values_for_profile", null);
+        Login.who_is_the_user = Login.pref.getString("user_role", null);
+        Login.alert_token = Login.pref.getString("alert_token", null);
+
+        Intent i = getIntent();
+        incident_id_for_personnel = i.getStringExtra("incident_id_for_personnel");
+
 
         all_clear_b = (ImageButton) findViewById(R.id.allclearbut);
         evacuate_b = (ImageButton) findViewById(R.id.evacuatebut);
@@ -132,20 +158,110 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         rescue_b = (ImageButton) findViewById(R.id.rescuebut);
         utility_b = (ImageButton) findViewById(R.id.utilitiesbut);
 
+        noti_dash = (Button) findViewById(R.id.noti_dashboard);
+        take_cmd = (Button) findViewById(R.id.transfer);
 
-        header.setText("CAPTAIN/INCIDENT COMMANDER: " + Login.username.toUpperCase());
+        header = (TextView) findViewById(R.id.header);
+        header.setText("BATTALION CHIEF/INCIDENT CMD : " + Login.username.toUpperCase());
+
+        FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        if (/*snapshot.child("personnel").getValue(String.class).contains(Login.snapshot_parent) &&*/ snapshot.child("status").getValue(String.class).equals("open")) {
+                            Log.e("personnel", snapshot.getKey());
+                            incident_id_for_personnel = snapshot.getKey();
+                            note_for_personnel = snapshot.child("note_reference").getValue(String.class);
+                            notification_id_for_personnel = snapshot.child("notification").getValue(String.class);
+                            captain_id_for_personnel = snapshot.child("captain").getValue(String.class);
+                            inc_date_for_personnel = snapshot.child("date").getValue(String.class);
+                            inc_time_for_personnel = snapshot.child("time").getValue(String.class);
+                            inc_lat_for_personnel = snapshot.child("latitude").getValue(String.class);
+                            inc_long_for_personnel = snapshot.child("longitude").getValue(String.class);
+                            personnels_id_for_personnel = snapshot.child("personnel").getValue(String.class);
+                            inc_status_for_personnel = snapshot.child("status").getValue(String.class);
+                            inc_address_for_personnel = snapshot.child("address").getValue(String.class);
+
+                            edit.putString("incident_id_for_personnel", incident_id_for_personnel);
+                            edit.putString("note_for_personnel", note_for_personnel);
+                            edit.putString("notification_id_for_personnel", notification_id_for_personnel);
+                            edit.putString("captain_id_for_personnel", captain_id_for_personnel);
+                            edit.putString("inc_date_for_personnel", inc_date_for_personnel);
+                            edit.putString("inc_time_for_personnel", inc_time_for_personnel);
+                            edit.putString("inc_lat_for_personnel", inc_lat_for_personnel);
+                            edit.putString("inc_long_for_personnel", inc_long_for_personnel);
+                            edit.putString("personnels_id_for_personnel", personnels_id_for_personnel);
+                            edit.putString("inc_status_for_personnel", inc_status_for_personnel);
+                            edit.putString("inc_address_for_personnel", inc_address_for_personnel);
+                            edit.commit();
+                            Log.e("mapready22", inc_lat_for_personnel + " " + inc_long_for_personnel + incident_id_for_personnel);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
-        Intent intent = getIntent();
-        llong = intent.getStringExtra("long");
-        llat = intent.getStringExtra("lat");
-        adde = intent.getStringExtra("address");
-        incident_id = intent.getStringExtra("incident_id");
-        notification_id = intent.getStringExtra("notification");
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                // Got last known location. In some rare situations this can be null.
+                if (location != null) {
+                    // Logic to handle location objec
+                    cur_lat = location.getLatitude() + "";
+                    cur_lon = location.getLongitude() + "";
+                }
+            }
+        });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = getString(R.string.default_notification_channel_id);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        }
+
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                Object value = getIntent().getExtras().get(key);
+                Log.d(TAG, "Key: " + key + " Value: " + value);
+            }
+        }
 
 
-        p1 = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("qwe", "getInstanceId failed", task.getException());
+                            return;
+                        }
+                        token = task.getResult().getToken();
+                        String msg = getString(R.string.msg_token_fmt, token);
+                        Log.d("qwe", msg);
+                        Toast.makeText(Battalion_Chief_Dashboard.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if (user == null) {
+                    startActivity(new Intent(Battalion_Chief_Dashboard.this, Login.class));
+                    finish();
+                }
+            }
+        };
+
+        mapFragment.getMapAsync(this);
 
         myTimer = new Timer();
         myTimer.schedule(new TimerTask() {
@@ -154,7 +270,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                 check_control();
                 setButton();
             }
-        }, 0, 2000);
+        }, 0, 10000);
 
 
         myTimer1 = new Timer();
@@ -163,103 +279,62 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             public void run() {
                 last_know_location();
             }
-        }, 0, 15000);
+        }, 0, 5000);
 
 
-
-
-
-
-        note.setOnClickListener(new View.OnClickListener() {
+        noti_dash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                LayoutInflater inflater = getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.activity_note, null);
-                builder.setCancelable(false);
-                builder.setView(dialogView);
-                final EditText note = (EditText) dialogView.findViewById(R.id.note);
-                final Button note_save = (Button) dialogView.findViewById(R.id.note_save);
-
-                final AlertDialog dialog = builder.create();
-                dialog.show();
-                dialog.setCancelable(true);
-                dialog.setCanceledOnTouchOutside(true);
-
-                myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.getChildrenCount() != 0) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                if (snapshot.child("captain").getValue(String.class).equals(Login.snapshot_parent) && snapshot.getKey().equals(incident_id)) {
-                                    note.setText(snapshot.child("note_reference").getValue(String.class));
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-
-                note_save.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        note_detail = note.getText().toString();
-                        if (TextUtils.isEmpty(note_detail)) {
-                            Toast.makeText(mContext, "Fields Empty", Toast.LENGTH_SHORT).show();
-                        } else {
-                            method.save_note(Login.snapshot_parent, note_detail);
-                            Toast.makeText(getApplicationContext(), "NOTE SAVE", Toast.LENGTH_SHORT).show();
-                            dialog.cancel();
-                            startActivity(getIntent());
-                        }
-                    }
-                });
-
-            }
-        });
-
-        street.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Incident_Cmd_DashBoard.this, StreetView.class)
-                        .putExtra("lat", llat)
-                        .putExtra("long", llong)
-                        .putExtra("adde", adde));
-            }
-        });
-
-        notification.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                startActivity(new Intent(Incident_Cmd_DashBoard.this, Notification.class)
-                        .putExtra("incident_id", incident_id)
-                        .putExtra("notification_id", notification_id)
-
-
-                );
-            }
-        });
-
-        dashboard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Incident_Cmd_DashBoard.this, Incident_Cmd_Noti_DashBoard.class)
-                        .putExtra("incident_id", incident_id)
-                        .putExtra("notification_id", notification_id)
+                startActivity(new Intent(Battalion_Chief_Dashboard.this, Battalion_Chief_Noti_Dashboard.class)
+                        .putExtra("incident_id", incident_id_for_personnel)
                         .putExtra("transfer_control", transfer_control + "")
+
                 );
             }
         });
+
+
+
+        take_cmd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(myContext, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(myContext);
+                }
+                builder.setTitle("Control Transfer".toUpperCase())
+                        .setMessage("Take Control")
+                        .setPositiveButton("TRANSFER", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                HashMap map = new HashMap<>();
+                                map.put("transfer_control",1);
+                                FirebaseDatabase.getInstance().getReference("Incident").child(incident_id_for_personnel).updateChildren(map);
+
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+                                String DateandTime = sdf.format(new Date());
+                                HashMap map1 = new HashMap<>();
+                                map1.put(DateandTime,"Transfer Of Control");
+                                FirebaseDatabase.getInstance().getReference("Notification").child(incident_id_for_personnel).updateChildren(map1);
+
+
+                            }
+                        })
+                        .setNegativeButton("CANCEL",null)
+                        .show();
+            }
+        });
+
     }
 
+
     private void check_control() {
-        FirebaseDatabase.getInstance().getReference("Incident").child(incident_id).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("Incident").child(incident_id_for_personnel).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child("status").getValue(String.class).equals("open")) {
@@ -274,91 +349,9 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         });
     }
 
-    private void last_know_location() {
-
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // Logic to handle location object
-
-                            HashMap map = new HashMap<>();
-                            map.put("last_latitude", location.getLatitude() + "");
-                            map.put("last_longitude", location.getLongitude() + "");
-                            FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
-
-                            myTimer2 = new Timer();
-                            myTimer2.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    mark_location_personnel();
-                                }
-                            }, 0, 20000);
-
-                        }
-                    }
-                });
-    }
-
-    private void mark_location_personnel() {
-
-
-        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                if (dataSnapshot.getChildrenCount() != 0) {
-                    mMap.clear();
-
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String name = snapshot.child("name").getValue(String.class);
-                        double lat = Double.parseDouble(snapshot.child("last_latitude").getValue(String.class));
-                        double lon = Double.parseDouble(snapshot.child("last_longitude").getValue(String.class));
-                        String rol = snapshot.child("role").getValue(String.class);
-                        LatLng scu = new LatLng(lat, lon);
-
-                        String mayday_lat = snapshot.child("mayday_latitude").getValue(String.class);
-                        String mayday_lon = snapshot.child("mayday_longitude").getValue(String.class);
-
-
-                        if (rol.equals("captain")) {
-                            mMap.addMarker(new MarkerOptions().position(scu).title("IC " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                        } else {
-                            mMap.addMarker(new MarkerOptions().position(scu).title("FR " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
-                        }
-
-                        if (mayday_lat != null && mayday_lon != null) {
-                            LatLng mayday_latlng = new LatLng(Double.parseDouble(mayday_lat), Double.parseDouble(mayday_lon));
-                            mMap.addMarker(new MarkerOptions().position(mayday_latlng).title("MAYDAY MAYDAY " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-
-                        }
-
-
-                    }
-                    LatLng origin = new LatLng(Double.parseDouble(Captain_DashBoard.fire_station_lat), Double.parseDouble(Captain_DashBoard.fire_station_long));
-                    mMap.addMarker(new MarkerOptions().position(origin).title("Fire Station").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-
-                    LatLng end = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
-                    mMap.addMarker(new MarkerOptions().position(end).title("Incident").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                    loadmappath();
-
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-
     private void setButton() {
 
-        myRef1.child(notification_id).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef3.child(incident_id_for_personnel).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() != 0) {
@@ -433,14 +426,14 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             @Override
             public void onClick(View v) {
 
-                if (transfer_control == 0) {
+                if (transfer_control == 1) {
 
 
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
                     } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this);
                     }
 
                     builder.setTitle("Confirmation")
@@ -450,12 +443,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                     Log.e("helper", "yes");
 
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
+                                                    if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                         if (snapshot.child("par").child("send").getValue(Integer.class) == snapshot.child("par").child("received").getValue(Integer.class)) {
                                                             Log.e("SendReceived", "yes");
                                                             continue_fun();
@@ -470,17 +463,17 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                         private void continue_fun() {
 
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
+                                                            if (snapshot.getKey().equals(incident_id_for_personnel)) {
 
                                                                 if (par_button.equals("false")) {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("par").updateChildren(map);
                                                                     par_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -488,14 +481,14 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("par").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("par").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -520,11 +513,11 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 } else {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("par").updateChildren(map);
                                                                     par_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -532,14 +525,14 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("par").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("par").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -564,7 +557,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 }
                                                             }
                                                         }
@@ -600,12 +593,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         all_clear_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
+                if (transfer_control == 1) {
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
                     } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this);
                     }
                     builder.setTitle("Confirmation")
                             .setMessage("Want to Send ?")
@@ -614,12 +607,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                     Log.e("helper", "yes");
 
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
+                                                    if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                         if (snapshot.child("all_clear").child("send").getValue(Integer.class) == snapshot.child("all_clear").child("received").getValue(Integer.class)) {
                                                             Log.e("SendReceived", "yes");
                                                             continue_fun();
@@ -635,17 +628,17 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                         private void continue_fun() {
 
 
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
+                                                            if (snapshot.getKey().equals(incident_id_for_personnel)) {
 
                                                                 if (all_clear_button.equals("false")) {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("all_clear").updateChildren(map);
                                                                     all_clear_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -653,13 +646,13 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("all_clear").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("all_clear").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -684,11 +677,11 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 } else {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("all_clear").updateChildren(map);
                                                                     all_clear_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -696,14 +689,14 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("all_clear").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("all_clear").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -728,7 +721,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 }
                                                             }
                                                         }
@@ -763,12 +756,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         evacuate_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
+                if (transfer_control == 1) {
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
                     } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this);
                     }
                     builder.setTitle("Confirmation")
                             .setMessage("Want to Send ?")
@@ -777,12 +770,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                     Log.e("helper", "yes");
 
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
+                                                    if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                         if (snapshot.child("evacuate").child("send").getValue(Integer.class) == snapshot.child("evacuate").child("received").getValue(Integer.class)) {
                                                             Log.e("SendReceived", "yes");
                                                             continue_fun();
@@ -798,29 +791,29 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                         private void continue_fun() {
 
 
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
+                                                            if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                                 if (evacuate_button.equals("false")) {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("evacuate").updateChildren(map);
                                                                     evacuate_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("evacuate").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("evacuate").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -845,24 +838,24 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 } else {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("evacuate").updateChildren(map);
                                                                     evacuate_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("evacuate").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("evacuate").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -887,7 +880,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 }
                                                             }
                                                         }
@@ -922,12 +915,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         utility_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
+                if (transfer_control == 1) {
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
                     } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this);
                     }
                     builder.setTitle("Confirmation")
                             .setMessage("Want to Send ?")
@@ -936,12 +929,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                     Log.e("helper", "yes");
 
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
+                                                    if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                         if (snapshot.child("utility").child("send").getValue(Integer.class) == snapshot.child("utility").child("received").getValue(Integer.class)) {
                                                             Log.e("SendReceived", "yes");
                                                             continue_fun();
@@ -957,30 +950,30 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                         private void continue_fun() {
 
 
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
+                                                            if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                                 if (utility_button.equals("false")) {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("utility").updateChildren(map);
                                                                     utility_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("utility").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("utility").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1005,11 +998,11 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 } else {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("utility").updateChildren(map);
                                                                     utility_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -1017,14 +1010,14 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("utility").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("utility").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1049,7 +1042,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 }
                                                             }
                                                         }
@@ -1085,12 +1078,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         rescue_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
+                if (transfer_control == 1) {
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
                     } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this);
                     }
                     builder.setTitle("Confirmation")
                             .setMessage("Want to Send ?")
@@ -1099,12 +1092,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                     Log.e("helper", "yes");
 
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
+                                                    if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                         if (snapshot.child("rescue").child("send").getValue(Integer.class) == snapshot.child("rescue").child("received").getValue(Integer.class)) {
                                                             Log.e("SendReceived", "yes");
                                                             continue_fun();
@@ -1120,16 +1113,16 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                         private void continue_fun() {
 
 
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
+                                                            if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                                 if (rescue_button.equals("false")) {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("rescue").updateChildren(map);
                                                                     rescue_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -1137,13 +1130,13 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("rescue").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("rescue").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1168,25 +1161,25 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 } else {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("rescue").updateChildren(map);
                                                                     rescue_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("rescue").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("rescue").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1211,7 +1204,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 }
                                                             }
                                                         }
@@ -1248,12 +1241,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             public void onClick(View v) {
 
 
-                if (transfer_control == 0) {
+                if (transfer_control == 1) {
                     AlertDialog.Builder builder;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this, android.R.style.Theme_Material_Dialog_Alert);
                     } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+                        builder = new AlertDialog.Builder(Battalion_Chief_Dashboard.this);
                     }
                     builder.setTitle("Confirmation")
                             .setMessage("Want to Send ?")
@@ -1262,12 +1255,12 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                     Log.e("helper", "yes");
 
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    myRef3.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
+                                                    if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                         if (snapshot.child("mayday").child("send").getValue(Integer.class) == snapshot.child("mayday").child("received").getValue(Integer.class)) {
                                                             Log.e("SendReceived", "yes");
                                                             continue_fun();
@@ -1283,16 +1276,16 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                         private void continue_fun() {
 
 
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
+                                                            if (snapshot.getKey().equals(incident_id_for_personnel)) {
                                                                 if (mayday_button.equals("false")) {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("mayday").updateChildren(map);
                                                                     mayday_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -1300,13 +1293,13 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("mayday").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("mayday").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1332,11 +1325,11 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 } else {
                                                                     HashMap map = new HashMap();
                                                                     map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("mayday").updateChildren(map);
                                                                     mayday_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
                                                                     Log.e("helper", Arrays.toString(token_id));
@@ -1344,14 +1337,14 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("mayday").updateChildren(map);
 
 
                                                                     for (final String str : token_id) {
 
 
                                                                         map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id_for_personnel).child("mayday").updateChildren(map);
 
 
                                                                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1376,7 +1369,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     String DateandTime = sdf.format(new Date());
                                                                     HashMap hm = new HashMap();
                                                                     hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
+                                                                    myRef4.child(incident_id_for_personnel).updateChildren(hm);
                                                                 }
                                                             }
                                                         }
@@ -1409,22 +1402,99 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         });
 
 
+
+
+    }
+
+        private void last_know_location() {
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                // Got last known location. In some rare situations this can be null.
+                if (location != null) {
+                    // Logic to handle location objec
+                    cur_lat = location.getLatitude() + "";
+                    cur_lon = location.getLongitude() + "";
+
+
+                    HashMap map = new HashMap<>();
+                    map.put("last_latitude", cur_lat);
+                    map.put("last_longitude", cur_lon);
+                    FirebaseDatabase.getInstance().getReference("User").child(Login.snapshot_parent).updateChildren(map);
+
+                    myTimer2 = new Timer();
+                    myTimer2.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            mark_location_personnel();
+                        }
+                    }, 0, 20000);
+                }
+            }
+        });
+    }
+
+
+    private void mark_location_personnel() {
+
+        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    mMap.clear();
+
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String name = snapshot.child("name").getValue(String.class);
+                        double lat = Double.parseDouble(snapshot.child("last_latitude").getValue(String.class));
+                        double lon = Double.parseDouble(snapshot.child("last_longitude").getValue(String.class));
+                        String rol = snapshot.child("role").getValue(String.class);
+                        LatLng scu = new LatLng(lat, lon);
+
+                        String mayday_lat = snapshot.child("mayday_latitude").getValue(String.class);
+                        String mayday_lon = snapshot.child("mayday_longitude").getValue(String.class);
+
+
+                        if (rol.equals("captain")) {
+                            mMap.addMarker(new MarkerOptions().position(scu).title("IC " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                        } else if (rol.equals("battalion chief")) {
+                            mMap.addMarker(new MarkerOptions().position(scu).title("BC " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                        } else {
+                            mMap.addMarker(new MarkerOptions().position(scu).title("FR " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+                        }
+
+                        if (mayday_lat != null && mayday_lon != null) {
+                            LatLng mayday_latlng = new LatLng(Double.parseDouble(mayday_lat), Double.parseDouble(mayday_lon));
+                            mMap.addMarker(new MarkerOptions().position(mayday_latlng).title("MAYDAY MAYDAY " + name.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                        }
+                    }
+                    LatLng end = new LatLng(Double.parseDouble(inc_lat_for_personnel), Double.parseDouble(inc_long_for_personnel));
+                    mMap.addMarker(new MarkerOptions().position(end).title("Incident").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    loadmappath();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
     private void loadmappath() {
         String url = getUrl();
         Log.d("onMapClick", url.toString());
-        Incident_Cmd_DashBoard.FetchUrl FetchUrl = new Incident_Cmd_DashBoard.FetchUrl();
+        Battalion_Chief_Dashboard.FetchUrl FetchUrl = new Battalion_Chief_Dashboard.FetchUrl();
         FetchUrl.execute(url);
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
     }
 
     private String getUrl() {
 
-        String str_origin = "origin=" + Captain_DashBoard.fire_station_lat + "," + Captain_DashBoard.fire_station_long;
-        String str_dest = "destination=" + llat + "," + llong;
+        String str_origin = "origin=" + cur_lat + "," + cur_lon;
+        String str_dest = "destination=" + inc_lat_for_personnel + "," + inc_long_for_personnel;
         String sensor = "sensor=true";
         String mode = "mode=driving";
         String alternatives = "alternatives=false";
@@ -1436,7 +1506,6 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         Log.e("urlurl", url);
         return url;
     }
-
 
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
@@ -1465,6 +1534,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         return data;
     }
 
+
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
@@ -1488,7 +1558,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            ParserTask parserTask = new ParserTask();
+            Battalion_Chief_Dashboard.ParserTask parserTask = new Battalion_Chief_Dashboard.ParserTask();
             parserTask.execute(result);
 
         }
@@ -1552,6 +1622,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -1571,7 +1642,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
 //        mMap.addMarker(new MarkerOptions().position(scu).title(adde).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(scu));
 //        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-        show_map(Double.parseDouble(llat), Double.parseDouble(llong));
+//        show_map();
         loadmappath();
 
     }
@@ -1619,7 +1690,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //Prompt the user once explanation has been shown
-                                ActivityCompat.requestPermissions(Incident_Cmd_DashBoard.this,
+                                ActivityCompat.requestPermissions(Battalion_Chief_Dashboard.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
                             }
                         })
@@ -1635,18 +1706,18 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         }
     }
 
+    void show_map() {
 
-    void show_map(double lat, double lng) {
 
-        LatLng scu = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(scu).title("Incident Address: " + adde.toUpperCase()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(scu));
+        LatLng scu1 = new LatLng(Double.parseDouble(cur_lat), Double.parseDouble(cur_lon));
+        mMap.addMarker(new MarkerOptions().position(scu1).title("Current Position").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(scu1));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
 
-        LatLng scu1 = new LatLng(Double.parseDouble(Captain_DashBoard.fire_station_lat), Double.parseDouble(Captain_DashBoard.fire_station_long));
-        mMap.addMarker(new MarkerOptions().position(scu1).title(Login.firestation).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(scu1));
+        LatLng scu11 = new LatLng(Double.parseDouble(inc_lat_for_personnel), Double.parseDouble(inc_long_for_personnel));
+        mMap.addMarker(new MarkerOptions().position(scu11).title(Login.firestation).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(scu11));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
 
@@ -1656,7 +1727,6 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             }
         });
     }
-
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
@@ -1722,7 +1792,6 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         }
     }
 
-
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
@@ -1741,9 +1810,4 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         alert.show();
     }
 
-    @Override
-    public void onBackPressed() {
-        startActivity(new Intent(Incident_Cmd_DashBoard.this, Captain_DashBoard.class));
-        super.onBackPressed();
-    }
 }
