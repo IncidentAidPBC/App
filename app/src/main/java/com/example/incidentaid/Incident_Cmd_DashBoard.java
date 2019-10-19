@@ -447,7 +447,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             .setMessage("Want to Send PAR Command ?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("helper", "yes");
+                                    // Log.e("helper", "yes");
 
 
                                     myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -483,7 +483,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
                                                                     par_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -504,7 +504,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "PAR Is Called On", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -527,7 +527,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
                                                                     par_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -548,7 +548,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "PAR Is Called OFF", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -611,7 +611,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             .setMessage("Want to Send ?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("helper", "yes");
+                                    // Log.e("helper", "yes");
 
 
                                     myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -648,7 +648,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
                                                                     all_clear_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -668,7 +668,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "All Clear Is Called On", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -691,7 +691,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
                                                                     all_clear_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -712,7 +712,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "ALL Clear Is Called OFF", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -774,7 +774,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             .setMessage("Want to Send ?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("helper", "yes");
+                                    // Log.e("helper", "yes");
 
 
                                     myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -810,7 +810,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
                                                                     evacuate_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
@@ -829,7 +829,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Evacuate Is Called On", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -852,7 +852,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
                                                                     evacuate_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
@@ -871,7 +871,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Evacuate Is Called OFF", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -933,7 +933,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             .setMessage("Want to Send ?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("helper", "yes");
+                                    // Log.e("helper", "yes");
 
 
                                     myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -969,7 +969,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
                                                                     utility_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
@@ -989,7 +989,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Utility Is Called On", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -1012,7 +1012,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
                                                                     utility_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -1033,7 +1033,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Utility Is Called OFF", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -1096,7 +1096,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             .setMessage("Want to Send ?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("helper", "yes");
+                                    // Log.e("helper", "yes");
 
 
                                     myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1132,7 +1132,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
                                                                     rescue_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -1152,7 +1152,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Rescue Is Called On", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -1175,7 +1175,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
                                                                     rescue_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
                                                                     map.put("received", 0);
                                                                     map.put("send", token_id.length);
@@ -1195,7 +1195,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Rescue Is Called OFF", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -1259,7 +1259,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                             .setMessage("Want to Send ?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.e("helper", "yes");
+                                    // Log.e("helper", "yes");
 
 
                                     myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1295,7 +1295,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
                                                                     mayday_button = "true";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -1315,7 +1315,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Mayday Is Called On", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -1339,7 +1339,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                     FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
                                                                     mayday_button = "false";
                                                                     String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    Log.e("helper", Arrays.toString(token_id));
+                                                                    // Log.e("helper", Arrays.toString(token_id));
 
 
                                                                     map.put("received", 0);
@@ -1360,7 +1360,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                                                                                 if (dataSnapshot.getChildrenCount() != 0) {
                                                                                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                                         if (snapshot.getKey().equals(str)) {
-                                                                                            Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                             method.sendFCMPush("Alert", "Mayday Is Called OFF", snapshot.child("token").getValue(String.class));
                                                                                         }
                                                                                     }
@@ -1433,7 +1433,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         String output = "json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
 
-        Log.e("urlurl", url);
+        // Log.e("urlurl", url);
         return url;
     }
 

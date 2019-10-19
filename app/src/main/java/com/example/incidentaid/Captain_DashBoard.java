@@ -188,8 +188,8 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
                 if (dataSnapshot.getChildrenCount() != 0) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         if (snapshot.getKey().equals(Login.firestation)) {
-                            Log.e("123", snapshot.child("Latitude").getValue().toString());
-                            Log.e("123", snapshot.child("Longitude").getValue().toString());
+                            // Log.e("123", snapshot.child("Latitude").getValue().toString());
+                            // Log.e("123", snapshot.child("Longitude").getValue().toString());
                             fire_station_lat = snapshot.child("Latitude").getValue().toString();
                             fire_station_long = snapshot.child("Longitude").getValue().toString();
 
@@ -283,18 +283,18 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
 
                 for (final DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
-                    Log.e("qweqwe1", snapshot.child("firestation").getValue().toString());
-                    Log.e("qweqwe", Login.firestation);
+                    // Log.e("qweqwe1", snapshot.child("firestation").getValue().toString());
+                    // Log.e("qweqwe", Login.firestation);
 
                     if (snapshot.child("firestation").getValue().toString().equals(Login.firestation) &&
                             snapshot.child("role").getValue().toString().equals("not_captain")) {
-                        Log.e("qweqwe2", snapshot.child("name").getValue().toString());
+                        // Log.e("qweqwe2", snapshot.child("name").getValue().toString());
                         product.add(snapshot.child("name").getValue().toString().toUpperCase());
                     }
 
                     if (snapshot.child("firestation").getValue().toString().equals(Login.firestation) &&
                             snapshot.child("role").getValue().toString().equals("on_duty")) {
-                        Log.e("qweqwe2", snapshot.child("name").getValue().toString());
+                        // Log.e("qweqwe2", snapshot.child("name").getValue().toString());
                         onduty.add(snapshot.child("name").getValue().toString().toUpperCase() + " (" + snapshot.child("job_title").getValue().toString().toUpperCase() + ")");
                         id_list.add(snapshot.getKey());
                         token_list.add(snapshot.child("token").getValue().toString());
@@ -369,7 +369,7 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
                     }
                 };
                 on_duty.setAdapter(arrayAdapter1);
-                Log.e("id_list", id_list.toString());
+                // Log.e("id_list", id_list.toString());
             }
 
             @Override
@@ -429,7 +429,7 @@ public class Captain_DashBoard extends AppCompatActivity implements NavigationVi
 //                                            Toast.makeText(getApplicationContext(), "duty", Toast.LENGTH_SHORT).show();
                                             name_job = new HashMap<>();
                                             name_job.put(name_of_person, job_of_person);
-                                            Log.e("wer", name_job.toString());
+                                            // Log.e("wer", name_job.toString());
                                             HashMap map = new HashMap();
                                             map.put("role", "on_duty");
                                             userinfo.child(getparent).updateChildren(map);

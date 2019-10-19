@@ -94,7 +94,7 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
             }
         });
 
-        Log.e("hashmap", map + "");
+        // Log.e("hashmap", map + "");
         map.put("1", "A");
         map.put("0", " ");
 
@@ -148,7 +148,7 @@ public class Incident_Cmd_Noti_DashBoard extends AppCompatActivity {
         all_clear_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("hashmap", map + "");
+                // Log.e("hashmap", map + "");
 
                 final Query userQuery = FirebaseDatabase.getInstance().getReference().child("Alert");
                 userQuery.addListenerForSingleValueEvent(new ValueEventListener() {

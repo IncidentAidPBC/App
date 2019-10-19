@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -42,7 +41,7 @@ public class StreetView extends FragmentActivity implements OnStreetViewPanorama
 
         p1 = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
 
-        Toast.makeText(getApplicationContext(), llat +" "+llong, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(), llat +" "+llong, Toast.LENGTH_SHORT).show();
         heading = (TextView) findViewById(R.id.street_address);
         heading.setText("INCIDENT ADDRESS: " + addr.toUpperCase());
 

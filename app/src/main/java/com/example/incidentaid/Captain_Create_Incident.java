@@ -102,7 +102,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
     LatLng p2 = null; // new LatLng(37.350870, -121.933775);
     FirebaseDatabase firebaseDatabase;
     DatabaseReference myRef, myRef1, myRef2;
-    Geocoder coder = new Geocoder(Captain_Create_Incident.this);
+    Geocoder coder;
     ArrayList<String> product;
     ArrayList markerPoints = new ArrayList();
     private FusedLocationProviderClient fusedLocationClient;
@@ -131,7 +131,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
 
         mContext = Captain_Create_Incident.this;
         method = new Method(mContext);
-
+        coder = new Geocoder(mContext);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         address = (EditText) findViewById(R.id.address);
@@ -149,9 +149,9 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
         llat = intent.getStringExtra("lat");
         id_list = intent.getStringExtra("id_list");
         token_list = intent.getStringExtra("token_list");
-        Log.e("id_list", id_list);
+        // Log.e("id_list", id_list);
 
-        Log.e("1234", llat + " " + llong);
+        // Log.e("1234", llat + " " + llong);
         p1 = new LatLng(Double.parseDouble(llat), Double.parseDouble(llong));
         heading.setText("INCIDENT COMMANDER: " + temp.toUpperCase());
 
@@ -170,7 +170,6 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
                 last_know_location();
             }
         }, 0, 15000);
-
 
 
 
@@ -195,7 +194,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
                     Address location = addr.get(0);
                     p2 = p1;
                     p1 = new LatLng(location.getLatitude(), location.getLongitude());
-                    Toast.makeText(Captain_Create_Incident.this, p1.toString(), Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(Captain_Create_Incident.this, p1.toString(), Toast.LENGTH_SHORT).show();
                     show_map(p1.latitude, p1.longitude);
                     onStreetViewPanoramaReady(mStreetViewPanorama);
                     loadmappath();
@@ -252,7 +251,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
                                 edit.putString("inc_addr", inc_addr);
                                 edit.commit();
 
-                                Log.e("office", Captain_Create_Incident.incident_id);
+                                // Log.e("office", Captain_Create_Incident.incident_id);
 
                                 FirebaseDatabase.getInstance().getReference("Incident").addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
@@ -356,7 +355,7 @@ public class Captain_Create_Incident extends AppCompatActivity implements OnMapR
         String output = "json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
 
-        Log.e("urlurl", url);
+        // Log.e("urlurl", url);
         return url;
     }
 

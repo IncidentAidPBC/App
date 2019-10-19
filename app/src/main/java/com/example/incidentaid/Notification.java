@@ -77,7 +77,7 @@ public class Notification extends AppCompatActivity {
                 temp = temp.replaceAll("\\{", "");
                 temp = temp.replaceAll("\\}", "");
 
-                Log.e("notification", cap_id +" " + Login.snapshot_parent);
+                // Log.e("notification", cap_id +" " + Login.snapshot_parent);
                 String arr[] = temp.split(", ");
                 List l = new ArrayList();
 
@@ -99,7 +99,7 @@ public class Notification extends AppCompatActivity {
 
 
 
-                Log.e("List", l.toString());
+                // Log.e("List", l.toString());
 
                 arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, ll) {
                     @Override

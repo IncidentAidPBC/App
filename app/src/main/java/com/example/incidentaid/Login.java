@@ -69,7 +69,7 @@ public class Login extends AppCompatActivity {
                     if (dataSnapshot.getChildrenCount() != 0) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             if (snapshot.child("email").getValue().toString().equals(mAuth.getCurrentUser().getEmail())) {
-                                Log.e("qweqweqwe", snapshot.child("role").getValue().toString());
+                                // Log.e("qweqweqwe", snapshot.child("role").getValue().toString());
                                 path = snapshot.child("role").getValue(String.class);
                                 userid = snapshot.getKey();
 
@@ -105,10 +105,10 @@ public class Login extends AppCompatActivity {
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             if (dataSnapshot.getChildrenCount() != 0) {
                                                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    Log.e("personnel", snapshot.toString());
+                                                    // Log.e("personnel", snapshot.toString());
 
                                                     if (snapshot.child("personnel").getValue(String.class).contains(userid) && snapshot.child("status").getValue(String.class).equals("open")) {
-                                                        Log.e("personnel123", snapshot.toString());
+                                                        // Log.e("personnel123", snapshot.toString());
                                                         Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
                                                         startActivity(new Intent(Login.this, Personnel_Home.class));
                                                     }
@@ -198,7 +198,7 @@ public class Login extends AppCompatActivity {
                                     // Log and toast
                                     String msg = getString(R.string.msg_token_fmt, token);
                                     Log.d("qwe", msg);
-                                    Toast.makeText(Login.this, msg, Toast.LENGTH_SHORT).show();
+                                    // Toast.makeText(Login.this, msg, Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -243,7 +243,7 @@ public class Login extends AppCompatActivity {
                                                         if (who_is_the_user.equals("captain")) {
                                                             HashMap map = new HashMap();
                                                             map.put("token", token);
-                                                            Log.e("shubham1", token);
+                                                            // Log.e("qwe", token);
                                                             userinfo.child(Login.snapshot_parent).updateChildren(map);
                                                             Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(Login.this, Captain_DashBoard.class);
@@ -281,7 +281,7 @@ public class Login extends AppCompatActivity {
 
                                                             HashMap map = new HashMap();
                                                             map.put("token", token);
-                                                            Log.e("shubham2", token);
+                                                            // Log.e("qwe", token);
                                                             userinfo.child(Login.snapshot_parent).updateChildren(map);
 
 
@@ -290,10 +290,10 @@ public class Login extends AppCompatActivity {
                                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                            Log.e("personnel", snapshot.toString());
+                                                                            // Log.e("personnel", snapshot.toString());
 
                                                                             if (snapshot.child("personnel").getValue(String.class).contains(snapshot_parent) && snapshot.child("status").getValue(String.class).equals("open")) {
-                                                                                Log.e("personnel123", snapshot.toString());
+                                                                                // Log.e("personnel123", snapshot.toString());
                                                                                 Toast.makeText(Login.this, "Welcome", Toast.LENGTH_SHORT).show();
                                                                                 startActivity(new Intent(Login.this, Personnel_Home.class));
                                                                             }

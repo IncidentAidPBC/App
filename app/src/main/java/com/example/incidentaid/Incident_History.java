@@ -80,7 +80,7 @@ public class Incident_History extends AppCompatActivity {
                 if (dataSnapshot.getChildrenCount() != 0) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         if (snapshot.child("captain").getValue().toString().equals(Login.snapshot_parent)) {
-                            Log.e("qweqweqweqwe", snapshot.getKey().toString());
+                            // Log.e("qweqweqweqwe", snapshot.getKey().toString());
                             product.add("ADDRESS : " + snapshot.child("address").getValue(String.class) + " & DATE_TIME : " + snapshot.getKey().toUpperCase());
                         }
                     }

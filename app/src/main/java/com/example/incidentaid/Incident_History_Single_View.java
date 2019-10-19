@@ -68,7 +68,7 @@ public class Incident_History_Single_View extends AppCompatActivity {
 
         header.setText(address.toUpperCase());
 
-        Toast.makeText(getApplicationContext(), key + address, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(), key + address, Toast.LENGTH_SHORT).show();
 
         FirebaseDatabase.getInstance().getReference("Alert").child(key).child("all_clear").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -151,7 +151,7 @@ public class Incident_History_Single_View extends AppCompatActivity {
                             final String inc_cmd = snapshot.child("captain").getValue(String.class);
                             String person = snapshot.child("personnel").getValue(String.class);
                             all_people = inc_cmd + "," + person;
-                            Log.e("asdasdasd", all_people);
+                            // Log.e("asdasdasd", all_people);
 
                             FirebaseDatabase.getInstance().getReference().child("User").addListenerForSingleValueEvent(new ValueEventListener() {
                                 ArrayList<String> res;
@@ -161,11 +161,11 @@ public class Incident_History_Single_View extends AppCompatActivity {
                                     res = new ArrayList<>();
                                     for (DataSnapshot snapshot1 : dataSnapshot.getChildren()) {
                                         if (all_people.contains(snapshot1.getKey())) {
-                                            Log.e("asdasdasdasd", snapshot1.child("name").getValue(String.class));
+                                            // Log.e("asdasdasdasd", snapshot1.child("name").getValue(String.class));
                                             res.add(snapshot1.child("name").getValue(String.class));
                                         }
                                     }
-                                    Log.e("asdasdasdasd123", String.valueOf(res));
+                                    // Log.e("asdasdasdasd123", String.valueOf(res));
                                     inc_cmd_name.setText(res.get(0));
                                     String temp = "";
                                     for (int i = 1; i < res.size(); i++) {
@@ -206,7 +206,7 @@ public class Incident_History_Single_View extends AppCompatActivity {
                     }
                 }
 
-                Log.e("product", String.valueOf(product));
+                // Log.e("product", String.valueOf(product));
 
                 String temp = String.valueOf(product);
                 temp = temp.replaceAll("\\{", "");
@@ -218,7 +218,7 @@ public class Incident_History_Single_View extends AppCompatActivity {
                     l.add(str);
                 }
                 Collections.sort(l);
-                Log.e("List", l.toString());
+                // Log.e("List", l.toString());
 
                 arrayAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, l) {
                     @Override

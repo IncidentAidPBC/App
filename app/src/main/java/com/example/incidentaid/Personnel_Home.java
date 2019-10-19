@@ -180,7 +180,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                     if (snapshot.child("email").getValue(String.class).equals(Login.values_for_profile)) {
                         filladdress = snapshot.child("address").getValue(String.class);
                         fillpincode = snapshot.child("pincode").getValue(String.class);
-                        Log.e("mapready33", filladdress + " " + fillpincode);
+                        // Log.e("mapready33", filladdress + " " + fillpincode);
 
                     }
                 }
@@ -197,7 +197,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                 if (dataSnapshot.getChildrenCount() != 0) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         if (snapshot.child("personnel").getValue(String.class).contains(Login.snapshot_parent) && snapshot.child("status").getValue(String.class).equals("open")) {
-                            Log.e("personnel", snapshot.getKey());
+                            // Log.e("personnel", snapshot.getKey());
                             incident_id_for_personnel = snapshot.getKey();
                             note_for_personnel = snapshot.child("note_reference").getValue(String.class);
                             notification_id_for_personnel = snapshot.child("notification").getValue(String.class);
@@ -222,7 +222,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                             edit.putString("inc_status_for_personnel", inc_status_for_personnel);
                             edit.putString("inc_address_for_personnel", inc_address_for_personnel);
                             edit.commit();
-                            Log.e("mapready22", inc_lat_for_personnel + " " + inc_long_for_personnel);
+                            // Log.e("mapready22", inc_lat_for_personnel + " " + inc_long_for_personnel);
                         } else {
                             // Toast.makeText(getApplicationContext(), "Sry open incident for you", Toast.LENGTH_SHORT).show();
                         }
@@ -242,16 +242,16 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                 if (dataSnapshot.getChildrenCount() != 0) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         if (snapshot.getKey().equals(Login.firestation)) {
-                            Log.e("123", snapshot.child("Latitude").getValue(String.class));
-                            Log.e("123", snapshot.child("Longitude").getValue(String.class));
+                            // Log.e("123", snapshot.child("Latitude").getValue(String.class));
+                            // Log.e("123", snapshot.child("Longitude").getValue(String.class));
                             fire_station_lat = snapshot.child("Latitude").getValue(String.class);
                             fire_station_long = snapshot.child("Longitude").getValue(String.class);
 
                             edit.putString("fire_station_lan", fire_station_lat);
                             edit.putString("fire_station_long", fire_station_long);
                             edit.commit();
-                            Log.e("check_data2", fire_station_long + "");
-                            Log.e("mapready11", fire_station_lat + " " + fire_station_long);
+                            // Log.e("check_data2", fire_station_long + "");
+                            // Log.e("mapready11", fire_station_lat + " " + fire_station_long);
 
                         }
                     }
@@ -334,7 +334,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
             @Override
             public void onClick(View v) {
 
-                Log.e("check_data5", inc_lat_for_personnel + "");
+                // Log.e("check_data5", inc_lat_for_personnel + "");
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(Personnel_Home.this);
                 LayoutInflater inflater = getLayoutInflater();
@@ -494,10 +494,16 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                             if (snapshot.child("par").child("status").getValue().toString().equals("false") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm PAR OFF Alert", Login.alert_token);
                                 method.showalert("Please Respond","Send PAR OFF ACK");
+//                                method.showalert("Please Respond","Send PAR OFF ACK","YELLOW");
+
+
+
                             }
                             if (snapshot.child("par").child("status").getValue().toString().equals("true") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm PAR ON Alert", Login.alert_token);
                                 method.showalert("Please Respond","Send PAR ON ACK");
+//                                method.showalert("Please Respond","Send PAR OFF ACK","YELLOW");
+
                             }
 
 // all clear
@@ -601,7 +607,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For PAR On Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -625,7 +631,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For PAR Off Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -698,7 +704,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For All_Clear On Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -722,7 +728,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For All_Clear Off Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -795,7 +801,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Evacuate On Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -819,7 +825,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Evacuate Off Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -892,7 +898,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Utility On Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -916,7 +922,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Utility Off Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -989,7 +995,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Rescue On Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -1013,7 +1019,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Rescue Off Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -1086,7 +1092,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Mayday On Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -1110,7 +1116,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                                                                     if (dataSnapshot.getChildrenCount() != 0) {
                                                                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                                                             if (snapshot.getKey().equals(captain_id_for_personnel)) {
-                                                                                Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                                                // Log.e("helper", snapshot.child("token").getValue(String.class));
                                                                                 method.sendFCMPush("Alert Response", Login.snapshot_parent + " " + Login.username + " " + "Send ACK For Mayday Off Alert", snapshot.child("token").getValue(String.class));
                                                                             }
                                                                         }
@@ -1191,7 +1197,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         String output = "json";
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
 
-        Log.e("urlurl", url);
+        // Log.e("urlurl", url);
         return url;
     }
 
@@ -1594,7 +1600,7 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
                     i++;
-                    Log.e("sms", i + "");
+                    // Log.e("sms", i + "");
                     if (i % 3 == 0) {
                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override

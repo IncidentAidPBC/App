@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -70,7 +69,7 @@ public class Signup extends AppCompatActivity implements Serializable {
                 myRef1 = myRef.child(uuniq_id);
                 myRef2 = myRef1.child("email");
 
-                Log.e("qweqweqwe", eemail + ppassword + uuniq_id);
+                // Log.e("qweqweqwe", eemail + ppassword + uuniq_id);
 
 
                 if (TextUtils.isEmpty(uuniq_id)) {
@@ -115,16 +114,16 @@ public class Signup extends AppCompatActivity implements Serializable {
                 myRef.child(uuniq_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Log.e("asd",dataSnapshot.child("email").getValue(String.class)+"");
+                        // Log.e("asd",dataSnapshot.child("email").getValue(String.class)+"");
                         if (dataSnapshot.child("email").getValue(String.class) == null) {
-                            Log.e("asd", "ID or Email Not Found");
+                            // Log.e("asd", "ID or Email Not Found");
                             Toast.makeText(getApplicationContext(), "ID or Email Not Found", Toast.LENGTH_SHORT).show();
                         } else if (dataSnapshot.child("email").getValue(String.class).equals(eemail)) {
-                            Log.e("asd", "email found");
+                            // Log.e("asd", "email found");
                             method.registerNewEmail(uuniq_id, eemail, ppassword);
                             Toast.makeText(getApplicationContext(), "Welcome", Toast.LENGTH_SHORT).show();
                         } else {
-                            Log.e("asd", "ID or Email Not Found");
+                            // Log.e("asd", "ID or Email Not Found");
                             Toast.makeText(getApplicationContext(), "ID or Email Not Found", Toast.LENGTH_SHORT).show();
 
                         }
@@ -140,14 +139,14 @@ public class Signup extends AppCompatActivity implements Serializable {
 //                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 //                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 //                            if (snapshot.getKey().toString().equals(uuniq_id)) {
-//                                Log.e("asdasd", "yes " + " " + uuniq_id + " " + snapshot.getKey());
-//                                Log.e("asdasd1", snapshot.child(uuniq_id));
+                               // Log.e("asdasd", "yes " + " " + uuniq_id + " " + snapshot.getKey());
+                               // Log.e("asdasd1", snapshot.child(uuniq_id));
 //                            } else {
-//                                Log.e("asdasd", "no" + " " + uuniq_id + " " + snapshot.getKey());
+                               // Log.e("asdasd", "no" + " " + uuniq_id + " " + snapshot.getKey());
 //                            }
 //                        }
 //
-////                        Log.e("asdasd",dataSnapshot.child(uuniq_id).child("email").getValue().toString());
+                       // Log.e("asdasd",dataSnapshot.child(uuniq_id).child("email").getValue().toString());
 //
 ////                        if (dataSnapshot.child(uuniq_id).child("email").getValue().toString().equals(eemail)) {
 ////                            method.registerNewEmail(uuniq_id, eemail, ppassword);

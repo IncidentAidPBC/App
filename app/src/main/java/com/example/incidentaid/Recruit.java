@@ -7,7 +7,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -101,8 +100,8 @@ public class Recruit extends AppCompatActivity {
 
                 String[] products = new String[product.size()];
                 product.toArray(products);
-                Log.e("asasas1", String.valueOf(product));
-                Log.e("arr", Arrays.toString(products));
+                // Log.e("asasas1", String.valueOf(product));
+                // Log.e("arr", Arrays.toString(products));
 
                 ArrayList<Single_item> list = new ArrayList<>();
 
@@ -125,7 +124,7 @@ public class Recruit extends AppCompatActivity {
 
                 String[] products = new String[product.size()];
                 product.toArray(products);
-                Log.e("asasas1", String.valueOf(product));
+                // Log.e("asasas1", String.valueOf(product));
 
 
                 ArrayList<Single_item> list = new ArrayList<>();
@@ -151,7 +150,7 @@ public class Recruit extends AppCompatActivity {
                 String[] products = new String[product.size()];
                 product.add(0, "Select Fire Station");
                 product.toArray(products);
-                Log.e("asasas1", String.valueOf(product));
+                // Log.e("asasas1", String.valueOf(product));
 
                 ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(Recruit.this, android.R.layout.simple_spinner_item, product) {
                     @Override
@@ -308,7 +307,7 @@ public class Recruit extends AppCompatActivity {
                 ffirestation = firestation.getSelectedItem().toString().substring(0,14);
 
 
-                Log.e("123", jjob_title);
+                // Log.e("123", jjob_title);
 
 //                if (TextUtils.isEmpty(nname)) {
 //                    Toast.makeText(getApplicationContext(), "Enter Your First Name", Toast.LENGTH_SHORT).show();
@@ -375,7 +374,7 @@ public class Recruit extends AppCompatActivity {
                 qqualification = sb.toString();
                 qqualification = qqualification.substring(0, qqualification.length() - 2);
 
-                Log.e("qqqqq", qqualification);
+                // Log.e("qqqqq", qqualification);
 
 
                 //=============================
@@ -390,7 +389,7 @@ public class Recruit extends AppCompatActivity {
 
                 jjob_title = jjob_title.substring(0, jjob_title.length() - 2);
 
-                Log.e("qqqqq", jjob_title);
+                // Log.e("qqqqq", jjob_title);
 
 
                 AlertDialog.Builder builder;
@@ -404,8 +403,8 @@ public class Recruit extends AppCompatActivity {
                         .setPositiveButton("REGISTER", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 register.setEnabled(false);
-                                Log.e("qweqweqweqwe", qqualification);
-                                Log.e("qweqweqweqwe", jjob_title);
+                                // Log.e("qweqweqweqwe", qqualification);
+                                // Log.e("qweqweqweqwe", jjob_title);
                                 myRef2.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -429,8 +428,8 @@ public class Recruit extends AppCompatActivity {
                                             }
                                         }
 
-                                        Log.e("shubh", qqualification);
-                                        Log.e("shubh1", jjob_title);
+                                        // Log.e("qwe", qqualification);
+                                        // Log.e("qwe", jjob_title);
 
                                         method.registerNewRecruit(nname, eemail, qqualification, jjob_title, aaddress, ppincode, ffirestation);
 
