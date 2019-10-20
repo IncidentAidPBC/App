@@ -60,10 +60,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -101,6 +98,7 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         setContentView(R.layout.activity_incident_cmd_dashboard);
 
         Login.username = Login.pref.getString("username", null);
+        Login.snapshot_parent = Login.pref.getString("user_id", null);
         Captain_DashBoard.fire_station_long = Captain_DashBoard.pref.getString("fire_station_long", null);
         Captain_DashBoard.fire_station_lat = Captain_DashBoard.pref.getString("fire_station_lan", null);
 
@@ -164,10 +162,6 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
                 last_know_location();
             }
         }, 0, 15000);
-
-
-
-
 
 
         note.setOnClickListener(new View.OnClickListener() {
@@ -433,166 +427,170 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             @Override
             public void onClick(View v) {
 
-                if (transfer_control == 0) {
 
-
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                    }
-
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to Send PAR Command ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Log.e("helper", "yes");
-
-
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
-                                                        if (snapshot.child("par").child("send").getValue(Integer.class) == snapshot.child("par").child("received").getValue(Integer.class)) {
-                                                            Log.e("SendReceived", "yes");
-                                                            continue_fun();
-                                                        } else {
-                                                            Log.e("SendReceived", "no");
-                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        private void continue_fun() {
-
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (dataSnapshot.getChildrenCount() != 0) {
-                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
-
-                                                                if (par_button.equals("false")) {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
-                                                                    par_button = "true";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "PAR Is Called On", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                } else {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
-                                                                    par_button = "false";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "PAR Is Called OFF", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                }
-                                            });
-
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-                } else {
-                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
-                }
+                method.showalert1(transfer_control, mContext, "Confirmation", "Want to Send ?", incident_id, "par", par_button,
+                        "Alert","PAR Is Called Off", "PAR Is Called On", Login.snapshot_parent, Login.username, "PAR off Alert Sent To All", "PAR on Alert Sent To All");
+//                if (transfer_control == 0) {
+//
+//
+//
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+//                    }
+//
+//                    builder.setTitle("Confirmation")
+//                            .setMessage("Want to Send PAR Command ?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Log.e("helper", "yes");
+//
+//
+//                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            if (dataSnapshot.getChildrenCount() != 0) {
+//                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                    if (snapshot.getKey().equals(incident_id)) {
+//                                                        if (snapshot.child("par").child("send").getValue(Integer.class) == snapshot.child("par").child("received").getValue(Integer.class)) {
+//                                                            Log.e("SendReceived", "yes");
+//                                                            continue_fun();
+//                                                        } else {
+//                                                            Log.e("SendReceived", "no");
+//                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        private void continue_fun() {
+//
+//                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                @Override
+//                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                    if (dataSnapshot.getChildrenCount() != 0) {
+//                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                            if (snapshot.getKey().equals(incident_id)) {
+//
+//                                                                if (par_button.equals("false")) {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "true");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+//                                                                    par_button = "true";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "PAR Is Called On", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR On Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                } else {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "false");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+//                                                                    par_button = "false";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("par").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "PAR Is Called OFF", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "PAR off Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                }
+//                                            });
+//
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                                        }
+//                                    });
+//
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, null)
+////                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+//                } else {
+//                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
+//                }
             }
         });
 
@@ -600,162 +598,166 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         all_clear_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                    }
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to Send ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Log.e("helper", "yes");
 
+                method.showalert1(transfer_control, mContext, "Confirmation", "Want to Send ?", incident_id, "all_clear", all_clear_button,
+                        "Alert", "All Clear Is Called Off", "All Clear Is Called On", Login.snapshot_parent, Login.username, "All Clear off Alert Sent To All", "All Clear on Alert Sent To All");
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
-                                                        if (snapshot.child("all_clear").child("send").getValue(Integer.class) == snapshot.child("all_clear").child("received").getValue(Integer.class)) {
-                                                            Log.e("SendReceived", "yes");
-                                                            continue_fun();
-                                                        } else {
-                                                            Log.e("SendReceived", "no");
-                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        private void continue_fun() {
-
-
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (dataSnapshot.getChildrenCount() != 0) {
-                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
-
-                                                                if (all_clear_button.equals("false")) {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
-                                                                    all_clear_button = "true";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "All Clear Is Called On", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                } else {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
-                                                                    all_clear_button = "false";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "ALL Clear Is Called OFF", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                }
-                                            });
-
-
-                                        }
-
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-                } else {
-                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
-                }
+//                if (transfer_control == 0) {
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+//                    }
+//                    builder.setTitle("Confirmation")
+//                            .setMessage("Want to Send ?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Log.e("helper", "yes");
+//
+//
+//                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            if (dataSnapshot.getChildrenCount() != 0) {
+//                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                    if (snapshot.getKey().equals(incident_id)) {
+//                                                        if (snapshot.child("all_clear").child("send").getValue(Integer.class) == snapshot.child("all_clear").child("received").getValue(Integer.class)) {
+//                                                            Log.e("SendReceived", "yes");
+//                                                            continue_fun();
+//                                                        } else {
+//                                                            Log.e("SendReceived", "no");
+//                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        private void continue_fun() {
+//
+//
+//                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                @Override
+//                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                    if (dataSnapshot.getChildrenCount() != 0) {
+//                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                            if (snapshot.getKey().equals(incident_id)) {
+//
+//                                                                if (all_clear_button.equals("false")) {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "true");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+//                                                                    all_clear_button = "true";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "All Clear Is Called On", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear On Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                } else {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "false");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+//                                                                    all_clear_button = "false";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("all_clear").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "ALL Clear Is Called OFF", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "All Clear off Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                }
+//                                            });
+//
+//
+//                                        }
+//
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                        }
+//                                    });
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, null)
+////                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+//                } else {
+//                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
+//                }
             }
         });
 
@@ -763,158 +765,162 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         evacuate_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                    }
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to Send ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Log.e("helper", "yes");
 
+                method.showalert1(transfer_control, mContext, "Confirmation", "Want to Send ?", incident_id, "evacuate", evacuate_button,
+                        "Alert", "Evacuate Is Called Off", "Evacuate Is Called On", Login.snapshot_parent, Login.username, "Evacuate Off Alert Sent To All", "Evacuate On Alert Sent To All");
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
-                                                        if (snapshot.child("evacuate").child("send").getValue(Integer.class) == snapshot.child("evacuate").child("received").getValue(Integer.class)) {
-                                                            Log.e("SendReceived", "yes");
-                                                            continue_fun();
-                                                        } else {
-                                                            Log.e("SendReceived", "no");
-                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        private void continue_fun() {
-
-
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (dataSnapshot.getChildrenCount() != 0) {
-                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
-                                                                if (evacuate_button.equals("false")) {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
-                                                                    evacuate_button = "true";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Evacuate Is Called On", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                } else {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
-                                                                    evacuate_button = "false";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Evacuate Is Called OFF", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                }
-                                            });
-
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                } else {
-                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
-                }
+//                if (transfer_control == 0) {
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+//                    }
+//                    builder.setTitle("Confirmation")
+//                            .setMessage("Want to Send ?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Log.e("helper", "yes");
+//
+//
+//                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            if (dataSnapshot.getChildrenCount() != 0) {
+//                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                    if (snapshot.getKey().equals(incident_id)) {
+//                                                        if (snapshot.child("evacuate").child("send").getValue(Integer.class) == snapshot.child("evacuate").child("received").getValue(Integer.class)) {
+//                                                            Log.e("SendReceived", "yes");
+//                                                            continue_fun();
+//                                                        } else {
+//                                                            Log.e("SendReceived", "no");
+//                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        private void continue_fun() {
+//
+//
+//                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                @Override
+//                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                    if (dataSnapshot.getChildrenCount() != 0) {
+//                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                            if (snapshot.getKey().equals(incident_id)) {
+//                                                                if (evacuate_button.equals("false")) {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "true");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+//                                                                    evacuate_button = "true";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Evacuate Is Called On", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate On Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                } else {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "false");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+//                                                                    evacuate_button = "false";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("evacuate").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Evacuate Is Called OFF", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Evacuate Off Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                }
+//                                            });
+//
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                        }
+//                                    });
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, null)
+////                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+//
+//                } else {
+//                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
+//                }
             }
         });
 
@@ -922,162 +928,166 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         utility_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                    }
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to Send ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Log.e("helper", "yes");
 
+                method.showalert1(transfer_control, mContext, "Confirmation", "Want to Send ?", incident_id, "utility", utility_button,
+                        "Alert", "Utility Is Called Off", "Utility Is Called On", Login.snapshot_parent, Login.username, "Utility Off Alert Sent To All", "Utility On Alert Sent To All");
 
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
-                                                        if (snapshot.child("utility").child("send").getValue(Integer.class) == snapshot.child("utility").child("received").getValue(Integer.class)) {
-                                                            Log.e("SendReceived", "yes");
-                                                            continue_fun();
-                                                        } else {
-                                                            Log.e("SendReceived", "no");
-                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        private void continue_fun() {
-
-
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (dataSnapshot.getChildrenCount() != 0) {
-                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
-                                                                if (utility_button.equals("false")) {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
-                                                                    utility_button = "true";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Utility Is Called On", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                } else {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
-                                                                    utility_button = "false";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Utility Is Called OFF", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                }
-                                            });
-
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                } else {
-                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
-                }
+//                if (transfer_control == 0) {
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+//                    }
+//                    builder.setTitle("Confirmation")
+//                            .setMessage("Want to Send ?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Log.e("helper", "yes");
+//
+//
+//                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            if (dataSnapshot.getChildrenCount() != 0) {
+//                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                    if (snapshot.getKey().equals(incident_id)) {
+//                                                        if (snapshot.child("utility").child("send").getValue(Integer.class) == snapshot.child("utility").child("received").getValue(Integer.class)) {
+//                                                            Log.e("SendReceived", "yes");
+//                                                            continue_fun();
+//                                                        } else {
+//                                                            Log.e("SendReceived", "no");
+//                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        private void continue_fun() {
+//
+//
+//                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                @Override
+//                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                    if (dataSnapshot.getChildrenCount() != 0) {
+//                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                            if (snapshot.getKey().equals(incident_id)) {
+//                                                                if (utility_button.equals("false")) {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "true");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+//                                                                    utility_button = "true";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Utility Is Called On", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility On Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                } else {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "false");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+//                                                                    utility_button = "false";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("utility").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Utility Is Called OFF", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Utility Off Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//
+//
+//                                                @Override
+//                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                }
+//                                            });
+//
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                        }
+//                                    });
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, null)
+////                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+//
+//                } else {
+//                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
+//                }
             }
         });
 
@@ -1085,160 +1095,163 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
         rescue_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (transfer_control == 0) {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                    }
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to Send ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Log.e("helper", "yes");
 
-
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
-                                                        if (snapshot.child("rescue").child("send").getValue(Integer.class) == snapshot.child("rescue").child("received").getValue(Integer.class)) {
-                                                            Log.e("SendReceived", "yes");
-                                                            continue_fun();
-                                                        } else {
-                                                            Log.e("SendReceived", "no");
-                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        private void continue_fun() {
-
-
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (dataSnapshot.getChildrenCount() != 0) {
-                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
-                                                                if (rescue_button.equals("false")) {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
-                                                                    rescue_button = "true";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Rescue Is Called On", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                } else {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
-                                                                    rescue_button = "false";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Rescue Is Called OFF", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                }
-                                            });
-
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                } else {
-                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
-                }
+                method.showalert1(transfer_control, mContext, "Confirmation", "Want to Send ?", incident_id, "rescue", rescue_button,
+                        "Alert", "Rescue Is Called Off", "Rescue Is Called On", Login.snapshot_parent, Login.username, "Rescue Off Alert Sent To All", "Rescue On Alert Sent To All");
+//                if (transfer_control == 0) {
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+//                    }
+//                    builder.setTitle("Confirmation")
+//                            .setMessage("Want to Send ?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Log.e("helper", "yes");
+//
+//
+//                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            if (dataSnapshot.getChildrenCount() != 0) {
+//                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                    if (snapshot.getKey().equals(incident_id)) {
+//                                                        if (snapshot.child("rescue").child("send").getValue(Integer.class) == snapshot.child("rescue").child("received").getValue(Integer.class)) {
+//                                                            Log.e("SendReceived", "yes");
+//                                                            continue_fun();
+//                                                        } else {
+//                                                            Log.e("SendReceived", "no");
+//                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        private void continue_fun() {
+//
+//
+//                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                @Override
+//                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                    if (dataSnapshot.getChildrenCount() != 0) {
+//                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                            if (snapshot.getKey().equals(incident_id)) {
+//                                                                if (rescue_button.equals("false")) {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "true");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+//                                                                    rescue_button = "true";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Rescue Is Called On", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue On Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                } else {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "false");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+//                                                                    rescue_button = "false";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("rescue").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Rescue Is Called OFF", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Rescue Off Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                }
+//                                            });
+//
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                        }
+//                                    });
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, null)
+////                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+//
+//                } else {
+//                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
+//                }
             }
         });
 
@@ -1247,164 +1260,165 @@ public class Incident_Cmd_DashBoard extends AppCompatActivity implements OnMapRe
             @Override
             public void onClick(View v) {
 
-
-                if (transfer_control == 0) {
-                    AlertDialog.Builder builder;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
-                    } else {
-                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
-                    }
-                    builder.setTitle("Confirmation")
-                            .setMessage("Want to Send ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Log.e("helper", "yes");
-
-
-                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getChildrenCount() != 0) {
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    if (snapshot.getKey().equals(incident_id)) {
-                                                        if (snapshot.child("mayday").child("send").getValue(Integer.class) == snapshot.child("mayday").child("received").getValue(Integer.class)) {
-                                                            Log.e("SendReceived", "yes");
-                                                            continue_fun();
-                                                        } else {
-                                                            Log.e("SendReceived", "no");
-                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        private void continue_fun() {
-
-
-                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    if (dataSnapshot.getChildrenCount() != 0) {
-                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                            if (snapshot.getKey().equals(incident_id)) {
-                                                                if (mayday_button.equals("false")) {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "true");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
-                                                                    mayday_button = "true";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Mayday Is Called On", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday On Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                } else {
-                                                                    HashMap map = new HashMap();
-                                                                    map.put("status", "false");
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
-                                                                    mayday_button = "false";
-                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
-                                                                    // Log.e("helper", Arrays.toString(token_id));
-
-
-                                                                    map.put("received", 0);
-                                                                    map.put("send", token_id.length);
-                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
-
-
-                                                                    for (final String str : token_id) {
-
-
-                                                                        map.put(str, "0");
-                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
-
-
-                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                            @Override
-                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                                if (dataSnapshot.getChildrenCount() != 0) {
-                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                                                        if (snapshot.getKey().equals(str)) {
-                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
-                                                                                            method.sendFCMPush("Alert", "Mayday Is Called OFF", snapshot.child("token").getValue(String.class));
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            @Override
-                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                                            }
-                                                                        });
-                                                                    }
-                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
-                                                                    String DateandTime = sdf.format(new Date());
-                                                                    HashMap hm = new HashMap();
-                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday Off Alert Sent To All");
-                                                                    myRef2.child(notification_id).updateChildren(hm);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                }
-                                            });
-
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        }
-                                    });
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, null)
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                } else {
-                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
-                }
+                method.showalert1(transfer_control, mContext, "Confirmation", "Want to Send ?", incident_id, "mayday", mayday_button,
+                        "Alert", "Mayday Is Called Off", "Mayday Is Called On", Login.snapshot_parent, Login.username, "Mayday Off Alert Sent To All", "Mayday On Alert Sent To All");
+//                if (transfer_control == 0) {
+//                    AlertDialog.Builder builder;
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this, android.R.style.Theme_Material_Dialog_Alert);
+//                    } else {
+//                        builder = new AlertDialog.Builder(Incident_Cmd_DashBoard.this);
+//                    }
+//                    builder.setTitle("Confirmation")
+//                            .setMessage("Want to Send ?")
+//                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Log.e("helper", "yes");
+//
+//
+//                                    myRef1.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                            if (dataSnapshot.getChildrenCount() != 0) {
+//                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                    if (snapshot.getKey().equals(incident_id)) {
+//                                                        if (snapshot.child("mayday").child("send").getValue(Integer.class) == snapshot.child("mayday").child("received").getValue(Integer.class)) {
+//                                                            Log.e("SendReceived", "yes");
+//                                                            continue_fun();
+//                                                        } else {
+//                                                            Log.e("SendReceived", "no");
+//                                                            method.showalert("Alert", "Not Received ACK From All So Can't Send..");
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        private void continue_fun() {
+//
+//
+//                                            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                @Override
+//                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                    if (dataSnapshot.getChildrenCount() != 0) {
+//                                                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                            if (snapshot.getKey().equals(incident_id)) {
+//                                                                if (mayday_button.equals("false")) {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "true");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+//                                                                    mayday_button = "true";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Mayday Is Called On", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday On Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                } else {
+//                                                                    HashMap map = new HashMap();
+//                                                                    map.put("status", "false");
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+//                                                                    mayday_button = "false";
+//                                                                    String token_id[] = snapshot.child("personnel").getValue(String.class).split(",");
+//                                                                    // Log.e("helper", Arrays.toString(token_id));
+//
+//
+//                                                                    map.put("received", 0);
+//                                                                    map.put("send", token_id.length);
+//                                                                    FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+//
+//
+//                                                                    for (final String str : token_id) {
+//
+//
+//                                                                        map.put(str, "0");
+//                                                                        FirebaseDatabase.getInstance().getReference("Alert").child(incident_id).child("mayday").updateChildren(map);
+//
+//
+//                                                                        FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                                                            @Override
+//                                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                                                                if (dataSnapshot.getChildrenCount() != 0) {
+//                                                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                                                                        if (snapshot.getKey().equals(str)) {
+//                                                                                            // Log.e("helper", snapshot.child("token").getValue(String.class));
+//                                                                                            method.sendFCMPush("Alert", "Mayday Is Called OFF", snapshot.child("token").getValue(String.class));
+//                                                                                        }
+//                                                                                    }
+//                                                                                }
+//                                                                            }
+//
+//                                                                            @Override
+//                                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                                            }
+//                                                                        });
+//                                                                    }
+//                                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+//                                                                    String DateandTime = sdf.format(new Date());
+//                                                                    HashMap hm = new HashMap();
+//                                                                    hm.put(DateandTime, Login.snapshot_parent + " " + Login.username + " " + "Send " + "Mayday Off Alert Sent To All");
+//                                                                    myRef2.child(notification_id).updateChildren(hm);
+//                                                                }
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//
+//
+//                                                @Override
+//                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                                }
+//                                            });
+//
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                        }
+//                                    });
+//                                }
+//                            })
+//                            .setNegativeButton(android.R.string.no, null)
+////                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+//
+//                } else {
+//                    method.showalert("Warning Cant Send Cmd", "You are not authorized");
+//                }
             }
         });
 
