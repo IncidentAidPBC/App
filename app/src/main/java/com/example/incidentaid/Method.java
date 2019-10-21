@@ -56,6 +56,7 @@ public class Method {
     private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Incident");
     private DatabaseReference myRef2 = FirebaseDatabase.getInstance().getReference("Notification");
     private DatabaseReference myRef3 = FirebaseDatabase.getInstance().getReference("Alert");
+    private AlertDialog.Builder colorbuilder;
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     String userID;
@@ -169,6 +170,36 @@ public class Method {
                 })
 //                .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+
+    public void showcoloralert(String title, String msg, int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            colorbuilder = new AlertDialog.Builder(mContext, android.R.style.Theme_Material_NoActionBar_Fullscreen);
+        } else {
+            colorbuilder = new AlertDialog.Builder(mContext);
+        }
+        colorbuilder.setTitle(title.toUpperCase())
+                .setMessage(msg)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+        final AlertDialog myAlertDialog = colorbuilder.create();
+        myAlertDialog.show();
+
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        // your code here
+                        myAlertDialog.dismiss();
+                    }
+                },
+                5000
+        );
+//                .show()
+//                .getWindow().setBackgroundDrawable(new ColorDrawable(color));
     }
 
     public void showalert(int transfer_control, final Context mContext, final String title, final String msg, final String id, final String child_name, final String button_status, final String FCMtitle,

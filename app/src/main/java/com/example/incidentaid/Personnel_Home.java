@@ -1005,8 +1005,6 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         });
 
 
-
-
     }
 
     private void last_know_location() {
@@ -1119,61 +1117,61 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
 // par
                             if (snapshot.child("par").child("status").getValue().toString().equals("false") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm PAR OFF Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send PAR OFF ACK");
+                                method.showcoloralert("Please Respond", "Send PAR OFF ACK", Color.rgb(0,255,0));
                             }
                             if (snapshot.child("par").child("status").getValue().toString().equals("true") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm PAR ON Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send PAR ON ACK");
+                                method.showcoloralert("Please Respond", "Send PAR ON ACK", Color.rgb(0,255,0));
                             }
 
 // all clear
                             if (snapshot.child("all_clear").child("status").getValue().toString().equals("false") && snapshot.child("all_clear").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm All_clear OFF Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send All_Clear OFF ACK");
+                                method.showcoloralert("Please Respond", "Send All_Clear OFF ACK", Color.rgb(0,255,255));
                             }
                             if (snapshot.child("all_clear").child("status").getValue().toString().equals("true") && snapshot.child("all_clear").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm All_clear ON Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send All_CLear ON ACK");
+                                method.showcoloralert("Please Respond", "Send All_CLear ON ACK", Color.rgb(0,255,255));
                             }
 
 // evacuate
                             if (snapshot.child("evacuate").child("status").getValue().toString().equals("false") && snapshot.child("evacuate").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Evacuate OFF Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Evacuate OFF ACK");
+                                method.showcoloralert("Please Respond", "Send Evacuate OFF ACK", Color.rgb(255,0,0));
                             }
                             if (snapshot.child("evacuate").child("status").getValue().toString().equals("true") && snapshot.child("evacuate").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Evacuate ON Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Evacuate ON ACK");
+                                method.showcoloralert("Please Respond", "Send Evacuate ON ACK", Color.rgb(255,0,0));
                             }
 
 // utility
                             if (snapshot.child("utility").child("status").getValue().toString().equals("false") && snapshot.child("utility").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Utility OFF Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Utility OFF ACK");
+                                method.showcoloralert("Please Respond", "Send Utility OFF ACK", Color.rgb(160,82,45));
                             }
                             if (snapshot.child("utility").child("status").getValue().toString().equals("true") && snapshot.child("utility").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Utility ON Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Utility ON ACK");
+                                method.showcoloralert("Please Respond", "Send Utility ON ACK", Color.rgb(160,82,45));
                             }
 
 // rescue
                             if (snapshot.child("rescue").child("status").getValue().toString().equals("false") && snapshot.child("rescue").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Rescue OFF Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Rescue OFF ACK");
+                                method.showcoloralert("Please Respond", "Send Rescue OFF ACK", Color.rgb(128, 0, 128));
                             }
                             if (snapshot.child("rescue").child("status").getValue().toString().equals("true") && snapshot.child("rescue").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Rescue ON Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Rescue ON ACK");
+                                method.showcoloralert("Please Respond", "Send Rescue ON ACK", Color.rgb(128, 0, 128));
                             }
 
 // mayday
                             if (snapshot.child("mayday").child("status").getValue().toString().equals("false") && snapshot.child("mayday").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Mayday OFF Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Mayday OFF ACK");
+                                method.showcoloralert("Please Respond", "Send Mayday OFF ACK", Color.rgb(255,140,0));
                             }
                             if (snapshot.child("mayday").child("status").getValue().toString().equals("true") && snapshot.child("mayday").child(Login.snapshot_parent).getValue().toString().equals("0")) {
                                 method.sendFCMPush("Alert", "Confirm Mayday ON Alert", Login.alert_token);
-                                method.showalert("Please Respond", "Send Mayday On ACK");
+                                method.showcoloralert("Please Respond", "Send Mayday On ACK", Color.rgb(255,140,0));
                             }
                         }
                     }
