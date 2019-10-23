@@ -93,6 +93,7 @@
             android:layout_marginRight="5dp"
             android:layout_marginBottom="5dp"
             android:layout_weight="2"
+            android:background="@drawable/border"
             android:orientation="vertical"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
@@ -103,13 +104,65 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="5dp"
-                android:layout_weight="1"
-                android:background="@drawable/border"
                 android:layout_marginBottom="5dp"
+                android:layout_weight="1"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <ImageButton
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_parbut"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/parbut"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="5dp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/parbut_noti"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignRight="@id/relative_layout_parbut"
+                        android:background="@drawable/item_count" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_allclearbut"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/allclearbut"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="5dp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/clearbut_noti"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignRight="@id/relative_layout_allclearbut"
+
+                        android:background="@drawable/item_count" />
+                </RelativeLayout>
+
+
+                <!--<ImageButton
                     android:id="@+id/parbut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -127,7 +180,7 @@
                     android:layout_weight="1"
                     android:text="ALL CLEAR"
                     android:textSize="13dp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold" />-->
 
                 <!--                <ImageButton-->
                 <!--                    android:id="@+id/allclearbut"-->
@@ -143,14 +196,65 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@drawable/border"
-                android:orientation="horizontal"
                 android:layout_marginBottom="5dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
                 android:weightSum="2">
 
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
-                <ImageButton
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_vacatebut"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/evacuatebut"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="5dp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/vacatebut_noti"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignRight="@id/relative_layout_vacatebut"
+
+                        android:background="@drawable/item_count" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_utilitybut"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/utilitiesbut"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="5dp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/utilitybut_noti"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignRight="@id/relative_layout_utilitybut"
+
+                        android:background="@drawable/item_count" />
+                </RelativeLayout>
+
+
+                <!--<ImageButton
                     android:id="@+id/evacuatebut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -166,7 +270,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:textSize="13dp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold" />-->
 
 
                 <!--                <ImageButton-->
@@ -223,12 +327,63 @@
                 android:layout_height="0dp"
                 android:layout_marginBottom="5dp"
                 android:layout_weight="1"
-                android:background="@drawable/border"
                 android:orientation="horizontal"
                 android:weightSum="2">
 
 
-                <ImageButton
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_rescuebut"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/rescuebut"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="5dp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/rescuebut_noti"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignRight="@id/relative_layout_rescuebut"
+
+                        android:background="@drawable/item_count" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:id="@+id/relative_layout_maydaybut"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/maydaybut"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="5dp" />
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/maydaybut_noti"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_alignRight="@id/relative_layout_maydaybut"
+
+                        android:background="@drawable/item_count" />
+                </RelativeLayout>
+
+                <!--<ImageButton
                     android:id="@+id/rescuebut"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -244,7 +399,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:textSize="13dp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold" />-->
 
                 <!--                <ImageButton-->
                 <!--                    android:id="@+id/rescuebut"-->

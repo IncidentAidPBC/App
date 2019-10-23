@@ -22,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -116,13 +118,18 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
     private static final String TAG = "MainActivity";
     private FusedLocationProviderClient fusedLocationClient;
-
+    public int par_on, par_off, clear_on, clear_off, vacate_on, vacate_off, utility_on, utility_off, rescue_on, rescue_off, mayday_on, mayday_off;
+    int vol_up, vol_down;
+    public static TextView par_noti, clear_noti, vacate_noti, utility_noti, rescue_noti, mayday_noti;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main1);
+
 
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -170,6 +177,14 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         rescue_b = (ImageButton) findViewById(R.id.rescuebut);
         utility_b = (ImageButton) findViewById(R.id.utilitiesbut);
         status_incident = (Button) findViewById(R.id.status);
+
+        par_noti = (TextView) findViewById(R.id.parbut_noti);
+        clear_noti = (TextView) findViewById(R.id.clearbut_noti);
+        vacate_noti = (TextView) findViewById(R.id.vacatebut_noti);
+        utility_noti = (TextView) findViewById(R.id.utilitybut_noti);
+        rescue_noti = (TextView) findViewById(R.id.rescuebut_noti);
+        mayday_noti = (TextView) findViewById(R.id.maydaybut_noti);
+
 
         status_incident.setText("OPEN");
 
@@ -335,7 +350,8 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
             public void run() {
                 sent_alert();
             }
-        }, 0, 10000);
+        }, 0, 4000);
+
 
         note.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1114,65 +1130,106 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         if (snapshot.getKey().equals(incident_id_for_personnel)) {
 
-// par
-                            if (snapshot.child("par").child("status").getValue().toString().equals("false") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm PAR OFF Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send PAR OFF ACK", Color.rgb(0,255,0));
-                            }
-                            if (snapshot.child("par").child("status").getValue().toString().equals("true") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm PAR ON Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send PAR ON ACK", Color.rgb(0,255,0));
-                            }
+                            par_on = 1;
+                            par_off = 1;
+                            clear_on = 1;
+                            clear_off = 1;
+                            vacate_on = 1;
+                            vacate_off = 1;
+                            utility_on = 1;
+                            utility_off = 1;
+                            rescue_on = 1;
+                            rescue_off = 1;
+                            mayday_on = 1;
+                            mayday_off = 1;
+                            par_noti.setBackground(null);
+                            clear_noti.setBackground(null);
+                            vacate_noti.setBackground(null);
+                            utility_noti.setBackground(null);
+                            rescue_noti.setBackground(null);
+                            mayday_noti.setBackground(null);
+
 
 // all clear
                             if (snapshot.child("all_clear").child("status").getValue().toString().equals("false") && snapshot.child("all_clear").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm All_clear OFF Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send All_Clear OFF ACK", Color.rgb(0,255,255));
-                            }
-                            if (snapshot.child("all_clear").child("status").getValue().toString().equals("true") && snapshot.child("all_clear").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm All_clear ON Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send All_CLear ON ACK", Color.rgb(0,255,255));
+//                                method.sendFCMPush("Alert", "Confirm All_clear OFF Alert", Login.alert_token);
+                                clear_off = 0;
+                                clear_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send All_Clear OFF ACK", Color.rgb(0, 255, 255));
+
+                            } else if (snapshot.child("all_clear").child("status").getValue().toString().equals("true") && snapshot.child("all_clear").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm All_clear ON Alert", Login.alert_token);
+                                clear_on = 0;
+                                clear_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send All_Clear ON ACK", Color.rgb(0, 255, 255));
                             }
 
 // evacuate
-                            if (snapshot.child("evacuate").child("status").getValue().toString().equals("false") && snapshot.child("evacuate").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Evacuate OFF Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Evacuate OFF ACK", Color.rgb(255,0,0));
-                            }
-                            if (snapshot.child("evacuate").child("status").getValue().toString().equals("true") && snapshot.child("evacuate").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Evacuate ON Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Evacuate ON ACK", Color.rgb(255,0,0));
-                            }
-
-// utility
-                            if (snapshot.child("utility").child("status").getValue().toString().equals("false") && snapshot.child("utility").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Utility OFF Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Utility OFF ACK", Color.rgb(160,82,45));
-                            }
-                            if (snapshot.child("utility").child("status").getValue().toString().equals("true") && snapshot.child("utility").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Utility ON Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Utility ON ACK", Color.rgb(160,82,45));
-                            }
-
-// rescue
-                            if (snapshot.child("rescue").child("status").getValue().toString().equals("false") && snapshot.child("rescue").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Rescue OFF Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Rescue OFF ACK", Color.rgb(128, 0, 128));
-                            }
-                            if (snapshot.child("rescue").child("status").getValue().toString().equals("true") && snapshot.child("rescue").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Rescue ON Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Rescue ON ACK", Color.rgb(128, 0, 128));
+                            else if (snapshot.child("evacuate").child("status").getValue().toString().equals("false") && snapshot.child("evacuate").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Evacuate OFF Alert", Login.alert_token);
+                                vacate_off = 0;
+                                vacate_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Evacuate OFF ACK", Color.rgb(255, 0, 0));
+                            } else if (snapshot.child("evacuate").child("status").getValue().toString().equals("true") && snapshot.child("evacuate").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Evacuate ON Alert", Login.alert_token);
+                                vacate_on = 0;
+                                vacate_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Evacuate ON ACK", Color.rgb(255, 0, 0));
                             }
 
 // mayday
-                            if (snapshot.child("mayday").child("status").getValue().toString().equals("false") && snapshot.child("mayday").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Mayday OFF Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Mayday OFF ACK", Color.rgb(255,140,0));
+                            else if (snapshot.child("mayday").child("status").getValue().toString().equals("false") && snapshot.child("mayday").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Mayday OFF Alert", Login.alert_token);
+                                mayday_off = 0;
+                                mayday_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Mayday OFF ACK", Color.rgb(255, 140, 0));
+                            } else if (snapshot.child("mayday").child("status").getValue().toString().equals("true") && snapshot.child("mayday").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Mayday ON Alert", Login.alert_token);
+                                mayday_on = 0;
+                                mayday_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Mayday On ACK", Color.rgb(255, 140, 0));
                             }
-                            if (snapshot.child("mayday").child("status").getValue().toString().equals("true") && snapshot.child("mayday").child(Login.snapshot_parent).getValue().toString().equals("0")) {
-                                method.sendFCMPush("Alert", "Confirm Mayday ON Alert", Login.alert_token);
-                                method.showcoloralert("Please Respond", "Send Mayday On ACK", Color.rgb(255,140,0));
+
+// par
+                            else if (snapshot.child("par").child("status").getValue().toString().equals("false") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm PAR OFF Alert", Login.alert_token);
+                                par_off = 0;
+                                par_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send PAR OFF ACK", Color.rgb(0, 255, 0));
+                            } else if (snapshot.child("par").child("status").getValue().toString().equals("true") && snapshot.child("par").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm PAR ON Alert", Login.alert_token);
+                                par_on = 0;
+                                par_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send PAR ON ACK", Color.rgb(0, 255, 0));
                             }
+
+
+// rescue
+                            else if (snapshot.child("rescue").child("status").getValue().toString().equals("false") && snapshot.child("rescue").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Rescue OFF Alert", Login.alert_token);
+                                rescue_off = 0;
+                                rescue_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Rescue OFF ACK", Color.rgb(128, 0, 128));
+                            } else if (snapshot.child("rescue").child("status").getValue().toString().equals("true") && snapshot.child("rescue").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Rescue ON Alert", Login.alert_token);
+                                rescue_on = 0;
+                                rescue_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Rescue ON ACK", Color.rgb(128, 0, 128));
+                            }
+// utility
+                            else if (snapshot.child("utility").child("status").getValue().toString().equals("false") && snapshot.child("utility").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Utility OFF Alert", Login.alert_token);
+                                utility_off = 0;
+                                utility_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Utility OFF ACK", Color.rgb(160, 82, 45));
+                            } else if (snapshot.child("utility").child("status").getValue().toString().equals("true") && snapshot.child("utility").child(Login.snapshot_parent).getValue().toString().equals("0")) {
+//                                method.sendFCMPush("Alert", "Confirm Utility ON Alert", Login.alert_token);
+                                utility_on = 0;
+                                utility_noti.setBackground(getDrawable(R.drawable.item_count));
+                                method.showcoloralert("Please Respond", "Send Utility ON ACK", Color.rgb(160, 82, 45));
+                            }
+
+
                         }
                     }
                 }
@@ -1624,19 +1681,66 @@ public class Personnel_Home extends AppCompatActivity implements NavigationView.
         auth.signOut();
     }
 
-    int i = 0;
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        int action = event.getAction();
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                vol_up = 0;
+                vol_down = 0;
+            }
+        }, 2000);
+
+
         int keyCode = event.getKeyCode();
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
+                int actionVU = event.getAction();
+                if (actionVU == KeyEvent.ACTION_DOWN) {
+                    vol_up++;
+                    if (vol_up % 2 == 0) {
+                        vol_up = 0;
+                        vol_down = 0;
+                        if ((par_on != 0) && (par_off != 0) && (clear_on != 0) && (clear_off != 0) && (vacate_on != 0) && (vacate_off != 0) && (utility_on != 0) && (utility_off != 0) && (rescue_on != 0) && (rescue_off != 0) && (mayday_on != 0) && mayday_off != 0) {
+                            Toast.makeText(Personnel_Home.this, "No ACK", Toast.LENGTH_SHORT).show();
+                            return true;
+                        } else if (clear_off == 0 || clear_on == 0) {
+                            method.showalert3(myContext, "all_clear", all_clear_button, Login.snapshot_parent, Login.username, incident_id_for_personnel,
+                                    "Send ACK For All Clear Off Alert", "Send ACK For All Clear On Alert", captain_id_for_personnel, "Alert Response", "Send ACK For All Clear Off Alert", "Send ACK For All Clear On Alert");
+                            return true;
+                        } else if (vacate_off == 0 || vacate_on == 0) {
+
+                            method.showalert3(myContext, "evacuate", evacuate_button, Login.snapshot_parent, Login.username, incident_id_for_personnel,
+                                    "Send ACK For EVACUATE Off Alert", "Send ACK For EVACUATE On Alert", captain_id_for_personnel, "Alert Response", "Send ACK For EVACUATE Off Alert", "Send ACK For EVACUATE On Alert");
+                            return true;
+                        } else if (mayday_off == 0 || mayday_on == 0) {
+                            method.showalert3(myContext, "mayday", mayday_button, Login.snapshot_parent, Login.username, incident_id_for_personnel,
+                                    "Send ACK For Mayday Off Alert", "Send ACK For Mayday On Alert", captain_id_for_personnel, "Alert Response", "Send ACK For Mayday Off Alert", "Send ACK For Mayday On Alert");
+                            return true;
+                        } else if (par_off == 0 || par_on == 0) {
+                            method.showalert3(myContext, "par", par_button, Login.snapshot_parent, Login.username, incident_id_for_personnel,
+                                    "Send ACK For PAR Off Alert", "Send ACK For PAR On Alert", captain_id_for_personnel, "Alert Response", "Send ACK For PAR Off Alert", "Send ACK For PAR On Alert");
+                            return true;
+                        } else if (rescue_off == 0 || rescue_on == 0) {
+                            method.showalert3(myContext, "rescue", rescue_button, Login.snapshot_parent, Login.username, incident_id_for_personnel,
+                                    "Send ACK For Rescue Off Alert", "Send ACK For Rescue On Alert", captain_id_for_personnel, "Alert Response", "Send ACK For Rescue Off Alert", "Send ACK For Rescue On Alert");
+                            return true;
+                        } else if (utility_off == 0 || utility_on == 0) {
+                            method.showalert3(myContext, "utility", utility_button, Login.snapshot_parent, Login.username, incident_id_for_personnel,
+                                    "Send ACK For Utility Off Alert", "Send ACK For Utility On Alert", captain_id_for_personnel, "Alert Response", "Send ACK For Utility Off Alert", "Send ACK For Utility On Alert");
+                            return true;
+                        }
+                    }
+                }
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if (action == KeyEvent.ACTION_DOWN) {
-                    i++;
-                    // Log.e("sms", i + "");
-                    if (i % 3 == 0) {
+                int actionVD = event.getAction();
+                if (actionVD == KeyEvent.ACTION_DOWN) {
+                    vol_down++;
+                    if (vol_down % 3 == 0) {
+                        vol_up = 0;
+                        vol_down = 0;
                         FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

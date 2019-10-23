@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.util.Log;
 import android.view.Gravity;
@@ -12,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,6 +48,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.ContentValues.TAG;
 
@@ -61,6 +67,11 @@ public class Method {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     String userID;
     Random rnd = new Random();
+
+    MediaPlayer mp = new MediaPlayer();
+    MediaPlayer player;
+    int volume_level = 10, volume_incr = 10;
+    boolean done;
 
 
     public Method() {
@@ -173,33 +184,39 @@ public class Method {
     }
 
     public void showcoloralert(String title, String msg, int color) {
+        playAlarm();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             colorbuilder = new AlertDialog.Builder(mContext, android.R.style.Theme_Material_NoActionBar_Fullscreen);
         } else {
             colorbuilder = new AlertDialog.Builder(mContext);
         }
-        colorbuilder.setTitle(title.toUpperCase())
-                .setMessage(msg)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
+        colorbuilder.setTitle(title.toUpperCase()).setMessage(msg);
         final AlertDialog myAlertDialog = colorbuilder.create();
         myAlertDialog.show();
+        myAlertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(color));
 
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
+        TextView messageView = (TextView) myAlertDialog.findViewById(android.R.id.message);
+        messageView.setTextSize(50);
+
+
+        new Timer().schedule(
+                new TimerTask() {
                     @Override
                     public void run() {
                         // your code here
                         myAlertDialog.dismiss();
                     }
                 },
-                5000
+                1000
         );
-//                .show()
-//                .getWindow().setBackgroundDrawable(new ColorDrawable(color));
+    }
+
+    private void playAlarm() {
+
+        AudioManager am = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+        final MediaPlayer mp = MediaPlayer.create(mContext, R.raw.alert);
+        mp.start();
     }
 
     public void showalert(int transfer_control, final Context mContext, final String title, final String msg, final String id, final String child_name, final String button_status, final String FCMtitle,
@@ -586,6 +603,85 @@ public class Method {
                 .show();
 
     }
+
+
+    public void showalert3(Context myContext, final String button_name, final String button_status, final String user_id, final String user_name, final String id,
+                           final String msg_send_off, final String msg_send_on, final String captain_id, final String cap_noti_title, final String cap_noti_msg_off, final String cap_noti_msg_on) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+        final String DateandTime = sdf.format(new Date());
+
+        FirebaseDatabase.getInstance().getReference("Alert").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() != 0) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        if (snapshot.getKey().equals(id)) {
+                            if (snapshot.child(button_name).child(user_id).getValue(String.class).equals("0")) {
+
+                                HashMap map = new HashMap();
+                                map.put(user_id, "1");
+                                map.put("received", snapshot.child(button_name).child("received").getValue(Integer.class) + 1);
+                                FirebaseDatabase.getInstance().getReference("Alert").child(id).child(button_name).updateChildren(map);
+
+                                if (button_status.equals("true")) {
+                                    HashMap hm = new HashMap();
+                                    hm.put(DateandTime, user_id + " " + user_name + " " + msg_send_on);
+                                    FirebaseDatabase.getInstance().getReference("Notification").child(id).updateChildren(hm);
+
+                                    FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.getChildrenCount() != 0) {
+                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                    if (snapshot.getKey().equals(captain_id)) {
+                                                        // Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                        sendFCMPush(cap_noti_title, user_id + " " + user_name + " " + cap_noti_msg_on, snapshot.child("token").getValue(String.class));
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        }
+                                    });
+                                } else {
+                                    HashMap hm = new HashMap();
+                                    hm.put(DateandTime, user_id + " " + user_name + " " + msg_send_off);
+                                    FirebaseDatabase.getInstance().getReference("Notification").child(id).updateChildren(hm);
+                                    FirebaseDatabase.getInstance().getReference("User").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.getChildrenCount() != 0) {
+                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                    if (snapshot.getKey().equals(captain_id)) {
+                                                        // Log.e("helper", snapshot.child("token").getValue(String.class));
+                                                        sendFCMPush(cap_noti_title, user_id + " " + user_name + " " + cap_noti_msg_off, snapshot.child("token").getValue(String.class));
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                        }
+                                    });
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
 //    public void showalert(final Context myContext, final String title,  final String msg, final String id, final String user_id, final String user_name, final String button_name, final String button_status,
 //                          final String ack_on, final String ack_off, final String captain_id, final String noti_title, final String noti_msg_off, final String noti_msg_on){
